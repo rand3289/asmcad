@@ -1,38 +1,20 @@
 #pragma once
+#include <SDL2/SDL.h> // Simple Directmedia Layer lib has to be installed
 #include <string>
 #include <vector>
 #include <memory>
 
 
-struct Point{
+struct Point {
     int x;
     int y;
-    Point(int X, int Y): x(X),y(Y){}
+    Point(int X, int Y): x(X), y(Y) {}
     Point& operator+(const Point& rhs);
     bool inRectangle(Point ul, Point lr);
 };
 
-//struct Image {
-//    void draw(const Point& xy);
-//};
-
-//enum ObjType{DROPZONE, LAYOUT, OPERATOR, SHAPE, MODULE};
-
-//static int getUniqueId();
-//static int getUniqueId(){ // TODO: move to .cpp
-//    static int lastId = 0;;
-//    return ++lastId;
-//}
-
 
 struct Object {
-//    int id;
-//    ObjType type;
-//    std::shared_ptr<Image> img;
-// Operators might have just 2 children: "self image" and "layout".
-//    std::vector<std::shared_ptr<Object>> children;
-//    Point loc; // location x,y.  Location has to be passed in.
-//    Point dim; // width, height.  Object determines its own dimentions during layout.
     std::shared_ptr<SDL_Texture> img;
     SDL_Rect loc; // location of the image
 
@@ -55,13 +37,10 @@ struct Object {
 };
 
 // Should "delete drop zone" be a root?
-// Root object (DROPZONE) will have a speciall object called "Dragged"
-// Operator will have a special object 'image of itself"
-
-// Need 2 layouts Vertical and Flow.  Vertical will be used in the main frame as "lines" and in the MODULE list
-// Flow layout will be used in top menu and to contain operators within "lines"
-// Vertical layout needs to scroll
 // Use shared_ptr value converted to int as a unique ID when saving code?
+
+// 2 layouts Vertical and Flow.  Vertical will be used in the main frame as "lines" and in the MODULE list
+// Flow layout will be used in top menu and to contain operators within "lines"
 
 // fixed horizontal & vertical size
 // scrolls on up()/down() events
@@ -71,24 +50,23 @@ class VerticalLayout: public Object {
 // no scrolling left-to-right layout
 class FlowLayout: public Object {
     std::vector<Object> children;
-}
+};
 
 // Operator's takeObject() and dropped() call saveScad() on self, 
 // then generate an image from saved text and then call module->setImage()
 
 class Operator: public Object {
     std::shared_ptr<Module> module;
-    HorisontalLayout layout;
+    FlowLayout layout;
 };
 class DropZone: public Object { // does not have children
 
 };
 class Input: public Object {  // does not have children // simple input box
     double value;
-
-}
+};
 class Shape: public Object { // does not have children
-
+    enum ShapeType {UNION, DIFFERENCE, INTERSECTION} type;
 };
 class Module: public Object { // does not have children
 

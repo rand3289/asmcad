@@ -4,13 +4,6 @@
 using namespace std;
 
 
-shared_ptr<SDL_Texture> loadImage(string filename){
-    SDL_Surface* img = SDL_LoadBMP( filename );
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
-    return shared_ptr<SLD_Texture>(texture);
-}
-
-
 void exitSDLerr(){
     std::cerr << "SDL error: " << SDL_GetError() << std::endl;
     SDL_Quit();

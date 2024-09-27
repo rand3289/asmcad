@@ -8,6 +8,7 @@
 struct Point {
     int x;
     int y;
+    Point(): x(0), y(0) {}
     Point(int X, int Y): x(X), y(Y) {}
     Point& operator+(const Point& rhs);
     bool inRectangle(Point ul, Point lr);
@@ -26,9 +27,9 @@ struct Object {
     virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img.get(), NULL, &loc); }
     virtual std::shared_ptr<Object> clone();
 
-    virtual void click(const Point& xy); // mouse click
+    virtual void click (const Point& xy); // mouse click
     virtual void clickr(const Point& xy); // right click
-    virtual void scroll(int y); // mouse wheel scrolls in vertical direction
+    virtual void scroll(const Point& xy, int y); // mouse wheel scrolls in vertical direction
 
     virtual std::shared_ptr<Object> takeObject(const Point& xy); // mouse started dragging within this object
     virtual void drag(const Point& xy); // another object is dragged accross this one
@@ -70,4 +71,11 @@ class Shape: public Object { // does not have children
 };
 class Module: public Object { // does not have children
 
+};
+
+
+struct ImageLoader {
+    static SDL_Renderer* renderer;
+    static void setRenderer(SDL_Renderer* rendereR){ renderer = rendereR; }
+    static bool setObjectImage(std::shared_ptr<Object>& obj, const std::string& filename);
 };

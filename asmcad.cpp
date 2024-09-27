@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h> // Simple Directmedia Layer lib has to be installed
+#include <SDL2/SDL_image.h> // for loading PNG images
 #include <memory>
+#include <iostream>
 #include "object.h"
 using namespace std;
 
@@ -12,7 +14,11 @@ void exitSDLerr(){
 
 
 int main(int argc, char* argv[]){
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) { exitSDLerr(); }
+    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) { exitSDLerr(); } // Initialize SDL2 library
+    if( !( IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG ) ) { exitSDLerr(); } // Initialize PNG loading
+//    int imgFlags = IMG_INIT_PNG;
+//    if( !( IMG_Init( imgFlags ) & imgFlags ) ) { exitSDLerr(); } // Initialize PNG loading
+
 //    SDL_DisplayMode dm;
 //    SDL_GetCurrentDisplayMode(0, &dm);
 
@@ -23,11 +29,14 @@ int main(int argc, char* argv[]){
     if(0==window){ exitSDLerr(); }
     SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
     if(0==renderer){ exitSDLerr(); }
+    ImageLoader::setRenderer(renderer);
 
-    shared_ptr<Object> draggedObject;
+// TODO: initialize root or the program will crash
     shared_ptr<Object> root;
+    shared_ptr<Object> draggedObject; // if not null, mouse is dragging this object
     Point xy;
     bool buttonDown = false;
+    Uint32 state = 0;
     SDL_Event e;
     bool run = true;
     while(run){
@@ -41,14 +50,14 @@ int main(int argc, char* argv[]){
                     break;
                 case SDL_MOUSEBUTTONUP:
                     buttonDown = false;
-                    Uint32 state = SDL_GetMouseState(&xy.x, &xy.y);
+                    state = SDL_GetMouseState(&xy.x, &xy.y);
                     if(draggedObject){
                         root->dropped(xy, draggedObject);
                         draggedObject.reset();
                     } else if(state & SDL_BUTTON(SDL_BUTTON_LEFT)){
                         root->click(xy);
                     } else if(state & SDL_BUTTON(SDL_BUTTON_RIGHT)){
-                        root->rclick(xy);
+                        root->clickr(xy);
                     }
                     break;
                 case SDL_MOUSEMOTION:
@@ -61,9 +70,9 @@ int main(int argc, char* argv[]){
                     break;
                 case SDL_MOUSEWHEEL:
                     SDL_GetMouseState(&xy.x, &xy.y);
-                    root->scroll(xy, event.wheel.y);
+                    root->scroll(xy, e.wheel.y);
                     break;
-                default:
+                default: break;
             } // switch
         } // while
 

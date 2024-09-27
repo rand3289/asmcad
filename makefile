@@ -2,7 +2,7 @@
 CC = g++  # notice CFLAGS contains -g which will compile everything in debug mode!
 CFLAGS = -g --std=c++11 -Wall -Wextra -Wno-unused-parameter
 DEPS = object.h
-OBJ = object.o 
+OBJ = object.o asmcad.o
 
 ifdef OS # windows defines this environment variable
 	LDFLAGS = -L. -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++

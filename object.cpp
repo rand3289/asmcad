@@ -47,8 +47,3 @@ bool makeObjectImage(shared_ptr<Object>& obj){
     obj->setImage(texture);
     return true;
 }
-
-
-Object::Object(const std::string imgFileName) {
-    img = ImageLoader::getImage(imgFileName);
-}

@@ -16,15 +16,17 @@ struct Point {
 
 
 struct Object {
-    std::shared_ptr<SDL_Texture> img;
     SDL_Rect loc; // location of the image
+    SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr
+    Object(): img(nullptr) {}
+    ~Object(){ if(img){ SDL_DestroyTexture(img); } }
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
     virtual bool removeChild(std::shared_ptr<Object&> obj);
     virtual bool saveScad(std::ofstream& file); // save self and children into an openscad file
     virtual void setLayout(const Point& xy);
-    virtual void setImage(std::shared_ptr<SDL_Texture>& sdlTexture){ img = sdlTexture; }
-    virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img.get(), NULL, &loc); }
+    virtual void setImage(SDL_Texture* sdlTexture){ img = sdlTexture; }
+    virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img, NULL, &loc); }
     virtual std::shared_ptr<Object> clone();
 
     virtual void click (const Point& xy); // mouse click
@@ -73,9 +75,11 @@ class Module: public Object { // does not have children
 
 };
 
-
-struct ImageLoader {
+// load SDL texture from a png image
+// this class has to be initialized by calling ImageLoader::setRenderer()
+class ImageLoader {
     static SDL_Renderer* renderer;
+public:
     static void setRenderer(SDL_Renderer* rendereR){ renderer = rendereR; }
     static bool setObjectImage(std::shared_ptr<Object>& obj, const std::string& filename);
 };

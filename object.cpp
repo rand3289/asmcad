@@ -17,8 +17,8 @@ bool ImageLoader::setObjectImage(shared_ptr<Object>& obj, const string& filename
         return false;
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
-//    shared_ptr<SDL_Texture> tex(texture);
-//    obj->setImage(tex);
+    SDL_FreeSurface(img);
+    obj->setImage(texture);
     return true;
 }
 

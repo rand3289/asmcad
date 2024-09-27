@@ -20,11 +20,11 @@ struct Object {
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
     virtual bool removeChild(std::shared_ptr<Object&> obj);
-    virtual void saveScad(std::ofstream& file); // save self and children into an openscad file
-    virtual void setLayout(Point xy);
+    virtual bool saveScad(std::ofstream& file); // save self and children into an openscad file
+    virtual void setLayout(const Point& xy);
     virtual void setImage(std::shared_ptr<SDL_Texture>& sdlTexture){ img = sdlTexture; }
-    virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img, NULL, &loc); }
-    virtual std::shared_ptr<Object>& clone();
+    virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img.get(), NULL, &loc); }
+    virtual std::shared_ptr<Object> clone();
 
     virtual void click(const Point& xy); // mouse click
     virtual void clickr(const Point& xy); // right click
@@ -56,7 +56,7 @@ class FlowLayout: public Object {
 // then generate an image from saved text and then call module->setImage()
 
 class Operator: public Object {
-    std::shared_ptr<Module> module;
+    std::shared_ptr<Object> module; // openscad module
     FlowLayout layout;
 };
 class DropZone: public Object { // does not have children

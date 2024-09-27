@@ -5,12 +5,13 @@ using namespace std;
 
 
 // load an image as an SDL2 texture
-bool setObjectImage(shared_ptr<Object>& obj, string& filename){
+bool setObjectImage(shared_ptr<Object>& obj, const string& filename){
     // TODO: SDL can handle bmp only!!!
-    SDL_Surface* img = SDL_LoadBMP( filename );
+    SDL_Surface* img = SDL_LoadBMP( filename.c_str() );
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
-    shared_ptr<SLD_Texture> tex(texture);
-    obj.setImage(tex);
+//    shared_ptr<SDL_Texture> tex(texture);
+//    obj->setImage(tex);
+    return true;
 }
 
 const string OUTPUT_FILE_SCAD = "asm.scad";

@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h> // Simple Directmedia Layer lib has to be installed
 #include <SDL2/SDL_image.h> // for loading PNG images
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include "object.h"
@@ -46,4 +47,42 @@ bool makeObjectImage(shared_ptr<Object>& obj){
     if(!texture){ return false; }
     obj->setImage(texture);
     return true;
+}
+
+
+// returns a root object that gets rendered and renders all of its children
+std::shared_ptr<Object> initGui(){
+    auto root   = make_shared<VerticalLayout>();
+    auto menu   = make_shared<FlowLayout>();     // top menu
+    auto level2 = make_shared<FlowLayout>();     // container for labels and main
+    auto labels = make_shared<VerticalLayout>(); // module pics
+    auto main   = make_shared<VerticalLayout>(); // main "code" area
+
+    auto dzView       = make_shared<DropZoneView>();
+    auto union_       = make_shared<Operator>(Operator::UNION);
+    auto difference   = make_shared<Operator>(Operator::DIFFERENCE);
+    auto intersection = make_shared<Operator>(Operator::INTERSECTION);
+    auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
+    auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
+    auto cube         = make_shared<Shape>(Shape::CUBE);
+    auto cylinder     = make_shared<Shape>(Shape::CYLINDER);
+    auto sphere       = make_shared<Shape>(Shape::SPHERE);
+    auto dzDelete     = make_shared<DropZoneDelete>(); // TODO: pass label and main in constructor
+
+    root  ->add(menu);
+    root  ->add(level2);
+    level2->add(labels);
+    level2->add(main);
+
+    menu->add(dzView);
+    menu->add(union_);
+    menu->add(difference);
+    menu->add(intersection);
+    menu->add(translate);
+    menu->add(rotate);
+    menu->add(cube);
+    menu->add(cylinder);
+    menu->add(sphere);
+    menu->add(dzDelete);
+    return root;
 }

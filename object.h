@@ -14,12 +14,12 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual ~Object(){ if(img){ SDL_DestroyTexture(img); } }
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
-    virtual bool removeChild(std::shared_ptr<Object> obj){ return true; };
+    virtual bool removeChild(std::shared_ptr<Object>& obj){ return true; };
     virtual bool saveScad(std::ofstream& file)=0; // save self and children into an openscad file
     virtual void setLayout(const Point& xy){}
     virtual void setImage(SDL_Texture* sdlTexture){ img = sdlTexture; }
     virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img, NULL, &loc); }
-//    virtual std::shared_ptr<Object> clone()=0;
+    virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
 
     virtual void click (const Point& xy){} // mouse click
     virtual void clickr(const Point& xy){} // right click
@@ -28,27 +28,42 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); } // mouse started dragging within this object
     virtual void drag(const Point& xy){} // another object is dragged accross this one
     virtual void dragEnd(){}
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>& obj){} // another object was dropped on top of this one
+    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj){} // another object was dropped on top of this one
 };
 
-
-// Vertical Layout will be used in the main frame as "lines" to contain Operator and in the MODULE list
-// fixed horizontal & vertical size. Changes only when main window is resized.
-// scrolls on up()/down() events
-class VerticalLayout: public Object {
-    std::vector<Object> children;
-public:
-    virtual bool removeChild(std::shared_ptr<Object&> obj);
-    virtual bool saveScad(std::ofstream& file);
-};
 
 // Flow layout will be used in top menu and to contain operators' children within "lines"
 // no scrolling. left-to-right layout
 class FlowLayout: public Object {
-    std::vector<Object> children;
+    std::vector<std::shared_ptr<Object>> children;
+    int findChildIndex(std::shared_ptr<Object>& obj);
 public:
-    virtual bool removeChild(std::shared_ptr<Object&> obj);
+    void add(std::shared_ptr<Object>const & obj);
     virtual bool saveScad(std::ofstream& file);
+    virtual bool removeChild(std::shared_ptr<Object>& obj);
+    virtual void setLayout(const Point& xy);
+    virtual void draw(SDL_Renderer* rend);
+
+    virtual std::shared_ptr<Object> takeObject(const Point& xy);
+    virtual void drag(const Point& xy);
+    virtual void dragEnd();
+    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+};
+
+// Vertical Layout will be used in the main frame as "lines" to contain Operator and in the MODULE list
+// fixed horizontal & vertical size. Changes only when main window is resized.
+// scrolls on up()/down() events
+// It can contain only Operator and Module objects
+class VerticalLayout: public FlowLayout {
+public:
+    virtual void setLayout(const Point& xy);
+    virtual void draw(SDL_Renderer* rend);
+
+    virtual void scroll(const Point& xy, int y);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy);
+    virtual void drag(const Point& xy);
+    virtual void dragEnd();
+    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // When Operator is dropped into the "module list" it should call saveScad() on self, 
@@ -56,15 +71,18 @@ public:
 class Operator: public Object {
     std::shared_ptr<Object> module; // openscad module
     FlowLayout layout;
-    enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
 public:
+    enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
+    Operator(OperatorType ot): type(ot){}
     virtual bool saveScad(std::ofstream& file);
 };
 
 // translate/rotate
-class Modifier: public Object{
-    enum ModifierType {TRANSLATE,ROTATE} type;
+// can "contain" Shape, Module and another Modifier
+class Modifier: public Object {
 public:
+    enum ModifierType {TRANSLATE, ROTATE} type;
+    Modifier(ModifierType mt): type(mt) {}
     virtual bool saveScad(std::ofstream& file);
 };
 
@@ -95,8 +113,9 @@ public:
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
 class Shape: public Object { // does not have children
-    enum ShapeType {CUBE, CYLINDER, SPHERE} type;
 public:
+    enum ShapeType {CUBE, CYLINDER, SPHERE} type;
+    Shape(ShapeType st): type(st) {}
     virtual bool saveScad(std::ofstream& file);
 };
 

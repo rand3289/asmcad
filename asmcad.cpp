@@ -16,29 +16,26 @@ void exitSDLerr(){
 int main(int argc, char* argv[]){
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) { exitSDLerr(); } // Initialize SDL2 library
     if( !( IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG ) ) { exitSDLerr(); } // Initialize PNG loading
-//    int imgFlags = IMG_INIT_PNG;
-//    if( !( IMG_Init( imgFlags ) & imgFlags ) ) { exitSDLerr(); } // Initialize PNG loading
-
 //    SDL_DisplayMode dm;
 //    SDL_GetCurrentDisplayMode(0, &dm);
 
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 768;
     const int WINPOS = SDL_WINDOWPOS_CENTERED;
-    SDL_Window* window=SDL_CreateWindow("block bored", WINPOS, WINPOS, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window* window=SDL_CreateWindow("ASM CAD", WINPOS, WINPOS, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if(0==window){ exitSDLerr(); }
     SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
     if(0==renderer){ exitSDLerr(); }
     ImageLoader::setRenderer(renderer);
 
-// TODO: initialize root or the program will crash
-    shared_ptr<Object> root;
+    shared_ptr<Object> root = initGui();
     shared_ptr<Object> draggedObject; // if not null, mouse is dragging this object
     Point xy;
     bool buttonDown = false;
     Uint32 state = 0;
     SDL_Event e;
     bool run = true;
+
     while(run){
         while( SDL_PollEvent( &e ) ){
             switch(e.type){

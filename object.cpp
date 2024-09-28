@@ -123,6 +123,9 @@ bool Input::saveScad(ostream& file){
     cout << value;
     return true;
 }
+void Input::draw(SDL_Renderer* rend){
+    // TODO: draw 'value' on screen
+}
 
 
 Modifier::Modifier(ModifierType mt): type(mt) {
@@ -131,13 +134,13 @@ Modifier::Modifier(ModifierType mt): type(mt) {
 }
 
 bool Modifier::saveScad(ostream& file){
-    file << (ROTATE==type ? "rotate(" : "translate(");
+    file << (ROTATE==type ? "rotate([" : "translate([");
     x.saveScad(file);
     file << ",";
     y.saveScad(file);
     file << ",";
     z.saveScad(file);
-    file << ") ";
+    file << "]) ";
     return true;
 }
 
@@ -150,6 +153,12 @@ void Modifier::setLocation(const Point& xy){
 //    y.setLocation();
 //    z.setLocation();
 }
+
+void Modifier::draw(SDL_Renderer* rend){
+    Object::draw(rend);
+    // TODO: draw inputs x,y,z
+}
+
 
 
 Operator::Operator(int width, OperatorType ot): layout(width), type(ot){
@@ -174,3 +183,7 @@ Shape::Shape(ShapeType st): type(st) {
     img = ImageLoader::getImage(imgFileName); 
 }
 bool Shape::saveScad(ostream& file){ return true; }
+void Shape::draw(SDL_Renderer* rend){
+    Object::draw(rend);
+    // TODO: draw inputs a,b,c
+}

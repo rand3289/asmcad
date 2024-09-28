@@ -85,7 +85,12 @@ public:
 // Change increment depends on whether Input was selected via click or right-click
 class Input: public Object {  // does not have children
     double value;
+    double delta;
 public:
+    Input(): value(0), delta(1.0) {}
+    virtual void draw(SDL_Renderer* rend);
+    virtual void click(const Point& xy){ delta = 1.0; }
+    virtual void clickr(const Point& xy){ delta = 0.01; } // change it slowly after right click
     virtual bool saveScad(std::ostream& file);
 };
 
@@ -98,6 +103,7 @@ class Modifier: public Object {
 public:
     enum ModifierType {TRANSLATE, ROTATE} type;
     Modifier(ModifierType mt);
+    virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
 };
@@ -122,9 +128,13 @@ public:
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
 class Shape: public Object { // does not have children
+    Input a; // used in cube, cylinder, sphere
+    Input b; // used in cube, cylinder
+    Input c; // used in cube
 public:
     enum ShapeType {CUBE, CYLINDER, SPHERE} type;
     Shape(ShapeType st);
+    virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
 };
 

@@ -17,6 +17,16 @@ void Object::setLocation(const Point& xy){
     loc.y = xy.y;
 }
 
+void Object::draw(SDL_Renderer* rend){
+    SDL_RenderCopy(rend, img, NULL, &loc);
+    if(draggedOver){
+        SDL_SetRenderDrawColor(rend,255,0,0,255);
+    } else {
+        SDL_SetRenderDrawColor(rend,255,255,255,255);
+    }
+    SDL_RenderDrawRect(rend, &loc);
+}
+
 
 bool Module::saveScad(ostream& file){ return true; }
 
@@ -31,7 +41,7 @@ void Input::draw(SDL_Renderer* rend){
 
 
 Modifier::Modifier(ModifierType mt): type(mt) {
-    const string imgFileName = ROTATE == type ? "rotate.png" : "translate.png";
+    const string imgFileName = ROTATE == type ? "img/rotate.png" : "img/translate.png";
     img = ImageLoader::getImage(imgFileName);
 }
 
@@ -66,9 +76,9 @@ void Modifier::draw(SDL_Renderer* rend){
 Operator::Operator(int width, OperatorType ot): layout(width), type(ot){
     string imgFileName;
     switch(type){
-        case UNION: imgFileName = "union.png"; break;
-        case DIFFERENCE: imgFileName = "difference.png"; break;
-        case INTERSECTION: imgFileName = "intersection.png"; break;
+        case UNION: imgFileName = "img/union.png"; break;
+        case DIFFERENCE: imgFileName = "img/difference.png"; break;
+        case INTERSECTION: imgFileName = "img/intersection.png"; break;
     }
     img = ImageLoader::getImage(imgFileName); 
 }
@@ -78,9 +88,9 @@ bool Operator::saveScad(ostream& file){ return true; }
 Shape::Shape(ShapeType st): type(st) {
     string imgFileName;
     switch(type){
-        case CUBE: imgFileName = "cube.png"; break;
-        case CYLINDER: imgFileName = "cylinder.png"; break;
-        case SPHERE: imgFileName = "sphere.png"; break;
+        case CUBE: imgFileName = "img/cube.png"; break;
+        case CYLINDER: imgFileName = "img/cylinder.png"; break;
+        case SPHERE: imgFileName = "img/sphere.png"; break;
     }
     img = ImageLoader::getImage(imgFileName); 
 }
@@ -93,8 +103,15 @@ void Shape::draw(SDL_Renderer* rend){
 
 void DropZoneView::drag(const Point& xy){}
 void DropZoneView::dragEnd(){}
-void DropZoneView::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}
+bool DropZoneView::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
+    // TODO: call makeObjectImage() if an operator without a Module was dropped
+    // saveScad on the Operator into OUTPUT_FILE_SCAD
+    return true;
+}
 
 void DropZoneDelete::drag(const Point& xy){}
 void DropZoneDelete::dragEnd(){}
-void DropZoneDelete::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}
+bool DropZoneDelete::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
+    // TODO: remove the object from main view, module view and DropZoneView
+    return true;
+}

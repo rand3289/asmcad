@@ -10,9 +10,9 @@ VerticalLayout::VerticalLayout(int width): FlowLayout(width) {}
 void VerticalLayout::scroll(const Point& xy, int y){}
 void VerticalLayout::drag(const Point& xy){}
 void VerticalLayout::dragEnd(){}
-void VerticalLayout::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}
 
 void VerticalLayout::setLocation(const Point& xy){
+    Object::setLocation(xy);
     Point current = xy;
     for(auto objPtr: children){
         objPtr->setLocation(current);
@@ -45,7 +45,7 @@ void FlowLayout::add(shared_ptr<Object>const & obj){
     children.push_back(obj);
 }
 
-bool FlowLayout::saveScad(ostream& file){ 
+bool FlowLayout::saveScad(ostream& file){
     for(auto& o: children){
         o->saveScad(file);
     }
@@ -63,13 +63,22 @@ void FlowLayout::draw(SDL_Renderer* rend){
     for(auto& objPtr: children){
         objPtr->draw(rend);
     }
+    if(draggedOver){
+        SDL_SetRenderDrawColor(rend,255,0,0,255);
+    } else {
+        SDL_SetRenderDrawColor(rend,255,255,255,255);
+    }
+    SDL_RenderDrawRect(rend, &loc);
 }
 
 shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
     for(auto it = begin(children); it!=end(children); ++it ){
         if(xy.inRectangle((*it)->loc)){
+            auto obj = (*it)->takeObject(xy);
+            if(obj){ return obj; }
             auto ptr = (*it);
             children.erase(it);
+            setLocation(Point(loc.x, loc.y)); // perform layout
             return ptr;
         }
     }
@@ -84,7 +93,17 @@ void FlowLayout::dragEnd(){
     cout << "|";
 }
 
-void FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
+bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
+    for(auto& o: children){
+        if(xy.inRectangle(o->loc)){
+            if(o->dropped(xy,obj) ){
+                setLocation(Point(loc.x,loc.y)); // perform layout
+                return true;
+            }
+        }
+    }
     add(obj);
+    setLocation(Point(loc.x,loc.y)); // perform layout
     cout << "added object" << endl;
+    return true;
 }

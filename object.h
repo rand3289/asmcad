@@ -5,10 +5,11 @@
 #include <memory>
 #include "misc.h"
 
-#define ITEM_HEIGHT 100
-#define ITEM_WIDTH 50
+#define ITEM_HEIGHT 150
+#define ITEM_WIDTH 100
 
 struct Object: public std::enable_shared_from_this<Object>{
+    bool draggedOver = false;
     SDL_Rect loc; // location of the image
     SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr. Own it
     Object();
@@ -19,17 +20,20 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual bool saveScad(std::ostream& file)=0; // save self and children into an openscad file
     virtual void setLocation(const Point& xy);
     virtual void setImage(SDL_Texture* sdlTexture){ img = sdlTexture; }
-    virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img, NULL, &loc); }
+    virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
 
     virtual void click (const Point& xy){} // mouse click
     virtual void clickr(const Point& xy){} // right click
     virtual void scroll(const Point& xy, int y){} // mouse wheel scrolls in vertical direction
 
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); } // mouse started dragging within this object
-    virtual void drag(const Point& xy){} // another object is dragged accross this one
-    virtual void dragEnd(){}
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj){} // another object was dropped on top of this one
+    // mouse started dragging within this object
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
+    // another object is dragged accross this one
+    virtual void drag(const Point& xy){ draggedOver = true; }
+    virtual void dragEnd(){ draggedOver = false; }
+    // another object was dropped on top of this one
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj){ return false; }
 };
 
 
@@ -51,7 +55,7 @@ public:
     virtual std::shared_ptr<Object> takeObject(const Point& xy);
     virtual void drag(const Point& xy);
     virtual void dragEnd();
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // Vertical Layout will be used in the main frame as "lines" to contain Operator and in the MODULE list
@@ -66,7 +70,6 @@ public:
     virtual void scroll(const Point& xy, int y);
     virtual void drag(const Point& xy);
     virtual void dragEnd();
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // When Operator is dropped into the "module list" it should call saveScad() on self, 
@@ -113,12 +116,12 @@ class DropZoneDelete: public Object { // does not have children
 public:
     DropZoneDelete(){
         loc.w = ITEM_WIDTH*2;
-        img = ImageLoader::getImage("delete.png");
+        img = ImageLoader::getImage("img/delete.png");
     }
     virtual bool saveScad(std::ostream& file){ return true; }
     virtual void drag(const Point& xy);
     virtual void dragEnd();
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // This is a component in the upper left corner
@@ -128,12 +131,12 @@ class DropZoneView: public Object { // does not have children
 public:
     DropZoneView(){ 
         loc.w = ITEM_WIDTH*2; 
-        img = ImageLoader::getImage("view.png");
+        img = ImageLoader::getImage("img/view.png");
     }
     virtual bool saveScad(std::ostream& file){ return true; }
     virtual void drag(const Point& xy);
     virtual void dragEnd();
-    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere

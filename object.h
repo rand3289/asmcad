@@ -5,18 +5,20 @@
 #include <memory>
 #include "misc.h"
 
+#define ITEM_HEIGHT 100
+#define ITEM_WIDTH 50
 
 struct Object: public std::enable_shared_from_this<Object>{
     SDL_Rect loc; // location of the image
     SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr. Own it
-    Object(): img(nullptr) {}
-    Object(const std::string imgFileName){ img = ImageLoader::getImage(imgFileName); }
+    Object();
+//    Object(const std::string imgFileName){ img = ImageLoader::getImage(imgFileName); }
     virtual ~Object(){ if(img){ SDL_DestroyTexture(img); } }
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
-    virtual bool removeChild(std::shared_ptr<Object>& obj){ return true; };
-    virtual bool saveScad(std::ofstream& file)=0; // save self and children into an openscad file
-    virtual void setLayout(const Point& xy){}
+    virtual bool removeChild(std::shared_ptr<Object>& obj){ return false; };
+    virtual bool saveScad(std::ostream& file)=0; // save self and children into an openscad file
+    virtual void setLocation(const Point& xy);
     virtual void setImage(SDL_Texture* sdlTexture){ img = sdlTexture; }
     virtual void draw(SDL_Renderer* rend){ SDL_RenderCopy(rend, img, NULL, &loc); }
     virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
@@ -39,9 +41,9 @@ class FlowLayout: public Object {
     int findChildIndex(std::shared_ptr<Object>& obj);
 public:
     void add(std::shared_ptr<Object>const & obj);
-    virtual bool saveScad(std::ofstream& file);
+
+    virtual bool saveScad(std::ostream& file);
     virtual bool removeChild(std::shared_ptr<Object>& obj);
-    virtual void setLayout(const Point& xy);
     virtual void draw(SDL_Renderer* rend);
 
     virtual std::shared_ptr<Object> takeObject(const Point& xy);
@@ -56,11 +58,8 @@ public:
 // It can contain only Operator and Module objects
 class VerticalLayout: public FlowLayout {
 public:
-    virtual void setLayout(const Point& xy);
     virtual void draw(SDL_Renderer* rend);
-
     virtual void scroll(const Point& xy, int y);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy);
     virtual void drag(const Point& xy);
     virtual void dragEnd();
     virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
@@ -73,33 +72,8 @@ class Operator: public Object {
     FlowLayout layout;
 public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
-    Operator(OperatorType ot): type(ot){}
-    virtual bool saveScad(std::ofstream& file);
-};
-
-// translate/rotate
-// can "contain" Shape, Module and another Modifier
-class Modifier: public Object {
-public:
-    enum ModifierType {TRANSLATE, ROTATE} type;
-    Modifier(ModifierType mt): type(mt) {}
-    virtual bool saveScad(std::ofstream& file);
-};
-
-// This is a component in the upper left corner
-// When an Operator is dropped here, it is deleted if it is unused in the rest of the "code"
-// When a Module is dropped here, module representation (name) is deleted from an Operator and Module list
-class DropZoneDelete: public Object { // does not have children
-public:
-    virtual bool saveScad(std::ofstream& file);
-};
-
-// This is a component in the upper right corner
-// When a module (operator) is dragged into it, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
-// Code in OUTPUT_FILE_SCAD should be opened in OpenScad for real-time display
-class DropZoneView: public Object { // does not have children
-public:
-    virtual bool saveScad(std::ofstream& file);
+    Operator(OperatorType ot);
+    virtual bool saveScad(std::ostream& file);
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -108,20 +82,51 @@ public:
 class Input: public Object {  // does not have children
     double value;
 public:
-    virtual bool saveScad(std::ofstream& file);
+    virtual bool saveScad(std::ostream& file);
+};
+
+// translate/rotate
+// can "contain" Shape, Module and another Modifier
+class Modifier: public Object {
+    Input x;
+    Input y;
+    Input z;
+public:
+    enum ModifierType {TRANSLATE, ROTATE} type;
+    Modifier(ModifierType mt);
+    virtual bool saveScad(std::ostream& file);
+    virtual void setLocation(const Point& xy);
+};
+
+// This is a component in the upper left corner
+// When an Operator is dropped here, it is deleted if it is unused in the rest of the "code"
+// When a Module is dropped here, module representation (name) is deleted from an Operator and Module list
+class DropZoneDelete: public Object { // does not have children
+public:
+    DropZoneDelete(){ loc.w = ITEM_WIDTH*2; }
+    virtual bool saveScad(std::ostream& file){ return true; }
+};
+
+// This is a component in the upper right corner
+// When a module (operator) is dragged into it, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
+// Code in OUTPUT_FILE_SCAD should be opened in OpenScad for real-time display
+class DropZoneView: public Object { // does not have children
+public:
+    DropZoneView(){ loc.w = ITEM_WIDTH*2; }
+    virtual bool saveScad(std::ostream& file);
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
 class Shape: public Object { // does not have children
 public:
     enum ShapeType {CUBE, CYLINDER, SPHERE} type;
-    Shape(ShapeType st): type(st) {}
-    virtual bool saveScad(std::ofstream& file);
+    Shape(ShapeType st);
+    virtual bool saveScad(std::ostream& file);
 };
 
 // Graphical representation (picture) of an Operator and all its children
 // This is an equivalent of OpenScad's module
 class Module: public Object { // does not have children
 public:
-    virtual bool saveScad(std::ofstream& file);
+    virtual bool saveScad(std::ostream& file);
 };

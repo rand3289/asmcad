@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 
         root->draw(renderer);
         if(draggedObject){
-            draggedObject->setLayout(xy);
+            draggedObject->setLocation(xy);
             draggedObject->draw(renderer);
         }
 

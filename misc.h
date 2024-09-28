@@ -3,9 +3,6 @@
 #include <string>
 #include <memory>
 
-#define ITEM_HEIGHT 100
-#define ITEM_WIDTH 100
-
 class Object;
 bool makeObjectImage(std::shared_ptr<Object>& obj); // makes an image of an Operator and set its corresponding Label
 std::shared_ptr<Object> initGui(); // initialize layout of the application's GUI
@@ -25,7 +22,16 @@ struct Point {
     int x,y;
     Point(): x(0), y(0) {}
     Point(int X, int Y): x(X), y(Y) {}
-    bool inRectangle(const SDL_Rect& loc){ return loc.x<=x && loc.y<=x && x<=loc.x+loc.w && y<=loc.y+loc.h; }
+    Point(const Point& rhs){
+        x = rhs.x;
+        y = rhs.y;
+    }
+    Point& operator=(const Point& rhs){
+        x = rhs.x;
+        y = rhs.y;
+        return *this;
+    }
 //    bool inRectangle(const Point ul, const Point lr);
-//    Point& operator+(const Point& rhs);
+    bool inRectangle(const SDL_Rect& loc) const { return loc.x<=x && loc.y<=x && x<=loc.x+loc.w && y<=loc.y+loc.h; }
+    Point operator+(const Point& rhs){ return Point(x+rhs.x,y+rhs.y); }
 };

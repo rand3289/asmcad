@@ -18,8 +18,8 @@ void Object::setLocation(const Point& xy){
 }
 
 
-bool DropZoneView::saveScad(ostream& file){ return true; }
 bool Module::saveScad(ostream& file){ return true; }
+
 
 bool Input::saveScad(ostream& file){
     cout << value;
@@ -89,3 +89,12 @@ void Shape::draw(SDL_Renderer* rend){
     Object::draw(rend);
     // TODO: draw inputs a,b,c
 }
+
+
+void DropZoneView::drag(const Point& xy){}
+void DropZoneView::dragEnd(){}
+void DropZoneView::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}
+
+void DropZoneDelete::drag(const Point& xy){}
+void DropZoneDelete::dragEnd(){}
+void DropZoneDelete::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}

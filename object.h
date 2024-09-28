@@ -97,9 +97,7 @@ public:
 // translate/rotate
 // can "contain" Shape, Module and another Modifier
 class Modifier: public Object {
-    Input x;
-    Input y;
-    Input z;
+    Input x,y,z;
 public:
     enum ModifierType {TRANSLATE, ROTATE} type;
     Modifier(ModifierType mt);
@@ -108,29 +106,39 @@ public:
     virtual void setLocation(const Point& xy);
 };
 
-// This is a component in the upper left corner
+// This is a component in the upper right corner
 // When an Operator is dropped here, it is deleted if it is unused in the rest of the "code"
 // When a Module is dropped here, module representation (name) is deleted from an Operator and Module list
 class DropZoneDelete: public Object { // does not have children
 public:
-    DropZoneDelete(){ loc.w = ITEM_WIDTH*2; }
+    DropZoneDelete(){
+        loc.w = ITEM_WIDTH*2;
+        img = ImageLoader::getImage("delete.png");
+    }
     virtual bool saveScad(std::ostream& file){ return true; }
+    virtual void drag(const Point& xy);
+    virtual void dragEnd();
+    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
-// This is a component in the upper right corner
+// This is a component in the upper left corner
 // When a module (operator) is dragged into it, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
 // Code in OUTPUT_FILE_SCAD should be opened in OpenScad for real-time display
 class DropZoneView: public Object { // does not have children
 public:
-    DropZoneView(){ loc.w = ITEM_WIDTH*2; }
-    virtual bool saveScad(std::ostream& file);
+    DropZoneView(){ 
+        loc.w = ITEM_WIDTH*2; 
+        img = ImageLoader::getImage("view.png");
+    }
+    virtual bool saveScad(std::ostream& file){ return true; }
+    virtual void drag(const Point& xy);
+    virtual void dragEnd();
+    virtual void dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
 class Shape: public Object { // does not have children
-    Input a; // used in cube, cylinder, sphere
-    Input b; // used in cube, cylinder
-    Input c; // used in cube
+    Input a,b,c;
 public:
     enum ShapeType {CUBE, CYLINDER, SPHERE} type;
     Shape(ShapeType st);

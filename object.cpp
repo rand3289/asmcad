@@ -18,10 +18,31 @@ void Object::setLocation(const Point& xy){
 }
 
 
-int FlowLayout::findChildIndex(shared_ptr<Object>& obj){
-    auto it = find(begin(children), end(children), obj);
-    return end(children) == it ? -1 : distance(begin(children), it);
+/**************************** FLowLayout ***************************** */
+FlowLayout::FlowLayout(int width) {
+    loc.w = width;
 }
+
+void FlowLayout::setLocation(const Point& xy){
+    Object::setLocation(xy);
+    Point next = xy;
+    for(auto& objPtr: children){
+        int nextx = next.x+objPtr->loc.w;
+        if(nextx > loc.x+loc.w){ // falls off the screen on the right
+            next.x = loc.x;
+            next.y = next.y+ITEM_HEIGHT;
+        }
+        objPtr->setLocation(next);
+        next.x+=objPtr->loc.w;
+    }
+    loc.h = (next.y - loc.y)+ITEM_HEIGHT; // if we increased the size 
+}
+
+
+//int FlowLayout::findChildIndex(shared_ptr<Object>& obj){
+//    auto it = find(begin(children), end(children), obj);
+//    return end(children) == it ? -1 : distance(begin(children), it);
+//}
 
 void FlowLayout::add(shared_ptr<Object>const & obj){
     children.push_back(obj);
@@ -41,7 +62,11 @@ bool FlowLayout::removeChild(shared_ptr<Object>& obj){
     return true;
 }
 
-void FlowLayout::draw(SDL_Renderer* rend){}
+void FlowLayout::draw(SDL_Renderer* rend){
+    for(auto& objPtr: children){
+        objPtr->draw(rend);
+    }
+}
 
 shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
     for(auto it = begin(children); it!=end(children); ++it ){
@@ -69,12 +94,26 @@ void FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
 
 
 /******************************* VerticalLayout *************************************/
-void VerticalLayout::draw(SDL_Renderer* rend){}
+VerticalLayout::VerticalLayout(int width): FlowLayout(width) {}
+
+void VerticalLayout::setLocation(const Point& xy){
+    Point current = xy;
+    for(auto objPtr: children){
+        objPtr->setLocation(current);
+        current.y+= objPtr->loc.h;
+    }
+    loc.h = current.y - loc.y;
+}
+
+//void VerticalLayout::draw(SDL_Renderer* rend){
+//    for(auto objPtr: children){
+//        objPtr->draw(rend);
+//    }
+//}
 void VerticalLayout::scroll(const Point& xy, int y){}
 void VerticalLayout::drag(const Point& xy){}
 void VerticalLayout::dragEnd(){}
 void VerticalLayout::dropped(const Point& xy, std::shared_ptr<Object>const & obj){}
-
 
 
 bool DropZoneView::saveScad(ostream& file){ return true; }
@@ -113,7 +152,7 @@ void Modifier::setLocation(const Point& xy){
 }
 
 
-Operator::Operator(OperatorType ot): type(ot){
+Operator::Operator(int width, OperatorType ot): layout(width), type(ot){
     string imgFileName;
     switch(type){
         case UNION: imgFileName = "union.png"; break;

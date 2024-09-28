@@ -51,23 +51,24 @@ bool makeObjectImage(shared_ptr<Object>& obj){
 
 
 // returns a root object that gets rendered and renders all of its children
-std::shared_ptr<Object> initGui(){
-    auto root   = make_shared<VerticalLayout>();
-    auto menu   = make_shared<FlowLayout>();     // top menu
-    auto level2 = make_shared<FlowLayout>();     // container for labels and main
-    auto labels = make_shared<VerticalLayout>(); // module pics
-    auto main   = make_shared<VerticalLayout>(); // main "code" area
+std::shared_ptr<Object> initGui(int width, int height){
+    auto root   = make_shared<VerticalLayout>(width);
+    auto menu   = make_shared<FlowLayout>(width);     // top menu
+    auto level2 = make_shared<FlowLayout>(width);     // container for labels and main
+    auto labels = make_shared<VerticalLayout>(2*ITEM_WIDTH); // module pics
+    width = width-2*ITEM_WIDTH;
+    auto main   = make_shared<VerticalLayout>(width); // main "code" area
 
     auto dzView       = make_shared<DropZoneView>();
-    auto union_       = make_shared<Operator>(Operator::UNION);
-    auto difference   = make_shared<Operator>(Operator::DIFFERENCE);
-    auto intersection = make_shared<Operator>(Operator::INTERSECTION);
+    auto union_       = make_shared<Operator>(width, Operator::UNION);
+    auto difference   = make_shared<Operator>(width, Operator::DIFFERENCE);
+    auto intersection = make_shared<Operator>(width, Operator::INTERSECTION);
     auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
     auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
     auto cube         = make_shared<Shape>(Shape::CUBE);
     auto cylinder     = make_shared<Shape>(Shape::CYLINDER);
     auto sphere       = make_shared<Shape>(Shape::SPHERE);
-    auto dzDelete     = make_shared<DropZoneDelete>(); // TODO: pass label and main in constructor
+    auto dzDelete     = make_shared<DropZoneDelete>(); // TODO: pass labels and main in constructor
 
     root  ->add(menu);
     root  ->add(level2);
@@ -84,5 +85,7 @@ std::shared_ptr<Object> initGui(){
     menu->add(cylinder);
     menu->add(sphere);
     menu->add(dzDelete);
+
+    root->setLocation(Point(0,0));
     return root;
 }

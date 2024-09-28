@@ -12,7 +12,6 @@ struct Object: public std::enable_shared_from_this<Object>{
     SDL_Rect loc; // location of the image
     SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr. Own it
     Object();
-//    Object(const std::string imgFileName){ img = ImageLoader::getImage(imgFileName); }
     virtual ~Object(){ if(img){ SDL_DestroyTexture(img); } }
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
@@ -37,12 +36,15 @@ struct Object: public std::enable_shared_from_this<Object>{
 // Flow layout will be used in top menu and to contain operators' children within "lines"
 // no scrolling. left-to-right layout
 class FlowLayout: public Object {
+protected:
     std::vector<std::shared_ptr<Object>> children;
-    int findChildIndex(std::shared_ptr<Object>& obj);
+//    int findChildIndex(std::shared_ptr<Object>& obj);
 public:
+    FlowLayout(int width);
     void add(std::shared_ptr<Object>const & obj);
 
     virtual bool saveScad(std::ostream& file);
+    virtual void setLocation(const Point& xy);
     virtual bool removeChild(std::shared_ptr<Object>& obj);
     virtual void draw(SDL_Renderer* rend);
 
@@ -58,7 +60,9 @@ public:
 // It can contain only Operator and Module objects
 class VerticalLayout: public FlowLayout {
 public:
-    virtual void draw(SDL_Renderer* rend);
+    VerticalLayout(int width);
+    virtual void setLocation(const Point& xy);
+//    virtual void draw(SDL_Renderer* rend);
     virtual void scroll(const Point& xy, int y);
     virtual void drag(const Point& xy);
     virtual void dragEnd();
@@ -72,7 +76,7 @@ class Operator: public Object {
     FlowLayout layout;
 public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
-    Operator(OperatorType ot);
+    Operator(int width, OperatorType ot);
     virtual bool saveScad(std::ostream& file);
 };
 

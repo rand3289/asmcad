@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
     if(0==renderer){ exitSDLerr(); }
     ImageLoader::setRenderer(renderer);
 
-    shared_ptr<Object> root = initGui();
+    shared_ptr<Object> root = initGui(SCREEN_WIDTH, SCREEN_HEIGHT);
     shared_ptr<Object> draggedObject; // if not null, mouse is dragging this object
     Point xy;
     bool buttonDown = false;

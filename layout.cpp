@@ -6,23 +6,22 @@
 using namespace std;
 
 
-VerticalLayout::VerticalLayout(int width): FlowLayout(width) {}
 void VerticalLayout::scroll(const Point& xy, int y){}
 
 void VerticalLayout::setLocation(const Point& xy){
+    cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<")"<< endl;
     Object::setLocation(xy);
     Point current = xy;
     for(auto objPtr: children){
         objPtr->setLocation(current);
         current.y+= objPtr->loc.h;
     }
-    loc.h = current.y - loc.y;
+    loc.h = current.y - xy.y;
 }
 
 
-FlowLayout::FlowLayout(int width) { loc.w = width; }
-
 void FlowLayout::setLocation(const Point& xy){
+    cout << "HLayout setting location at ("<< xy.x << ","<<xy.y<<")"<< endl;
     Object::setLocation(xy);
     Point next = xy;
     for(auto& objPtr: children){
@@ -45,7 +44,7 @@ bool FlowLayout::saveScad(ostream& file){
     return true;
 }
 
-void FlowLayout::add(shared_ptr<Object>const & obj){
+void FlowLayout::addObject(shared_ptr<Object>const & obj){
     children.push_back(obj);
 }
 
@@ -96,7 +95,7 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
             }
         }
     }
-    add(obj);
+    addObject(obj);
     setLocation(Point(loc.x,loc.y)); // perform layout
     cout << "Added an object. children size=" << children.size() << endl;
     return true;

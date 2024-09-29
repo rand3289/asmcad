@@ -55,11 +55,10 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto root   = make_shared<VerticalLayout>(width);
     auto menu   = make_shared<FlowLayout>(width);     // top menu
     auto level2 = make_shared<FlowLayout>(width);     // container for labels and main
-    auto labels = make_shared<VerticalLayout>(2*ITEM_WIDTH); // module pics
-    width = width-2*ITEM_WIDTH;
-    auto main   = make_shared<VerticalLayout>(width); // main "code" area
+    auto labels = make_shared<VerticalLayout>(ITEM_WIDTH); // module pics
+    auto main   = make_shared<VerticalLayout>(width-ITEM_WIDTH); // main "code" area
 
-    auto dzView       = make_shared<DropZoneView>();
+    auto dzView       = make_shared<DropZone>(DropZone::VIEW);
     auto union_       = make_shared<Operator>(width, Operator::UNION);
     auto difference   = make_shared<Operator>(width, Operator::DIFFERENCE);
     auto intersection = make_shared<Operator>(width, Operator::INTERSECTION);
@@ -68,23 +67,23 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto cube         = make_shared<Shape>(Shape::CUBE);
     auto cylinder     = make_shared<Shape>(Shape::CYLINDER);
     auto sphere       = make_shared<Shape>(Shape::SPHERE);
-    auto dzDelete     = make_shared<DropZoneDelete>(); // TODO: pass labels and main in constructor
+    auto dzDelete     = make_shared<DropZone>(DropZone::DELETE); // TODO: pass labels and main in constructor
 
-    root  ->add(menu);
-    root  ->add(level2);
-    level2->add(labels);
-    level2->add(main);
+    root  ->addObject(menu);
+    root  ->addObject(level2);
+    level2->addObject(labels);
+    level2->addObject(main);
 
-    menu->add(dzView);
-    menu->add(union_);
-    menu->add(difference);
-    menu->add(intersection);
-    menu->add(translate);
-    menu->add(rotate);
-    menu->add(cube);
-    menu->add(cylinder);
-    menu->add(sphere);
-    menu->add(dzDelete);
+    menu->addObject(dzView);
+    menu->addObject(union_);
+    menu->addObject(difference);
+    menu->addObject(intersection);
+    menu->addObject(translate);
+    menu->addObject(rotate);
+    menu->addObject(cube);
+    menu->addObject(cylinder);
+    menu->addObject(sphere);
+    menu->addObject(dzDelete);
 
     root->setLocation(Point(0,0));
     return root;

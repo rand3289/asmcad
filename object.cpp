@@ -82,6 +82,7 @@ Operator::Operator(int width, OperatorType ot): layout(width), type(ot){
     }
     img = ImageLoader::getImage(imgFileName); 
 }
+
 bool Operator::saveScad(ostream& file){ return true; }
 
 
@@ -101,17 +102,12 @@ void Shape::draw(SDL_Renderer* rend){
 }
 
 
-void DropZoneView::drag(const Point& xy){}
-void DropZoneView::dragEnd(){}
-bool DropZoneView::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
-    // TODO: call makeObjectImage() if an operator without a Module was dropped
-    // saveScad on the Operator into OUTPUT_FILE_SCAD
-    return true;
-}
-
-void DropZoneDelete::drag(const Point& xy){}
-void DropZoneDelete::dragEnd(){}
-bool DropZoneDelete::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
-    // TODO: remove the object from main view, module view and DropZoneView
+bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
+    if(VIEW == type){
+        // TODO: call makeObjectImage() if an operator without a Module was dropped
+        // saveScad on the Operator into OUTPUT_FILE_SCAD
+    } else {
+        // TODO: remove the object from main view, module view and DropZoneView
+    }
     return true;
 }

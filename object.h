@@ -44,8 +44,8 @@ protected:
     std::vector<std::shared_ptr<Object>> children;
 //    int findChildIndex(std::shared_ptr<Object>& obj);
 public:
-    FlowLayout(int width);
-    void add(std::shared_ptr<Object>const & obj);
+    FlowLayout(int width){ loc.w = width; }
+    void addObject(std::shared_ptr<Object>const & obj);
 
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
@@ -62,7 +62,7 @@ public:
 // It can contain only Operator and Module objects
 class VerticalLayout: public FlowLayout {
 public:
-    VerticalLayout(int width);
+    VerticalLayout(int width): FlowLayout(width) {}
     virtual void setLocation(const Point& xy);
     virtual void scroll(const Point& xy, int y);
 };
@@ -104,33 +104,19 @@ public:
     virtual void setLocation(const Point& xy);
 };
 
-// This is a component in the upper right corner
-// When an Operator is dropped here, it is deleted if it is unused in the rest of the "code"
+// These are VIEW and DELETE zones in the upper corners
+// When an Operator is dropped into DELETE, it is deleted if it is unused in the rest of the "code"
 // When a Module is dropped here, module representation (name) is deleted from an Operator and Module list
-class DropZoneDelete: public Object { // does not have children
-public:
-    DropZoneDelete(){
-        loc.w = ITEM_WIDTH*2;
-        img = ImageLoader::getImage("img/delete.png");
-    }
-    virtual bool saveScad(std::ostream& file){ return true; }
-    virtual void drag(const Point& xy);
-    virtual void dragEnd();
-    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
-};
-
-// This is a component in the upper left corner
-// When a module (operator) is dragged into it, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
+// When a module (operator) is dragged into VIEW, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
 // Code in OUTPUT_FILE_SCAD should be opened in OpenScad for real-time display
-class DropZoneView: public Object { // does not have children
+class DropZone: public Object { // does not have children
 public:
-    DropZoneView(){ 
+    enum DZType {VIEW, DELETE} type;
+    DropZone(DZType dzt): type(dzt) {
         loc.w = ITEM_WIDTH*2; 
-        img = ImageLoader::getImage("img/view.png");
+        img = ImageLoader::getImage( VIEW == type ? "img/view.png" : "img/delete.png");
     }
     virtual bool saveScad(std::ostream& file){ return true; }
-    virtual void drag(const Point& xy);
-    virtual void dragEnd();
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 

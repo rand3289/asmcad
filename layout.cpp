@@ -71,10 +71,15 @@ void FlowLayout::draw(SDL_Renderer* rend){
 shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
     for(auto it = begin(children); it!=end(children); ++it ){
         if(xy.inRectangle((*it)->loc)){
-            auto obj = (*it)->takeObject(xy);
-            if(obj){ return obj; }
+            auto obj = (*it)->takeObject(xy); // take from its children
+            if(obj){
+                cout << "Removing object from children. children size=" << children.size() <<endl;
+                setLocation(Point(loc.x, loc.y)); // perform layout
+                return obj;
+            }
             auto ptr = (*it);
             children.erase(it);
+            cout << "Removing Object. children size=" << children.size() << endl;
             setLocation(Point(loc.x, loc.y)); // perform layout
             return ptr;
         }
@@ -93,6 +98,6 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
     }
     add(obj);
     setLocation(Point(loc.x,loc.y)); // perform layout
-    cout << "added object" << endl;
+    cout << "Added an object. children size=" << children.size() << endl;
     return true;
 }

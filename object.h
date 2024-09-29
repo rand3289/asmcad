@@ -28,7 +28,7 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual void scroll(const Point& xy, int y){} // mouse wheel scrolls in vertical direction
 
     // mouse started dragging within this object
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return std::shared_ptr<Object>(); }
     // another object is dragged accross this one
     virtual void drag(const Point& xy){ draggedOver = true; }
     virtual void dragEnd(){ draggedOver = false; }

@@ -42,7 +42,6 @@ struct Object: public std::enable_shared_from_this<Object>{
 class FlowLayout: public Object {
 protected:
     std::vector<std::shared_ptr<Object>> children;
-//    int findChildIndex(std::shared_ptr<Object>& obj);
 public:
     FlowLayout(int width){ loc.w = width; }
     void addObject(std::shared_ptr<Object>const & obj);
@@ -133,6 +132,8 @@ public:
 // Graphical representation (picture) of an Operator and all its children
 // This is an equivalent of OpenScad's module
 class Module: public Object { // does not have children
+    std::weak_ptr<Object> parent;
 public:
+    Module(std::shared_ptr<Object> parenT): parent(parenT) {}
     virtual bool saveScad(std::ostream& file);
 };

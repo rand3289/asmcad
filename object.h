@@ -53,8 +53,6 @@ public:
     virtual void draw(SDL_Renderer* rend);
 
     virtual std::shared_ptr<Object> takeObject(const Point& xy);
-    virtual void drag(const Point& xy);
-    virtual void dragEnd();
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
@@ -66,10 +64,7 @@ class VerticalLayout: public FlowLayout {
 public:
     VerticalLayout(int width);
     virtual void setLocation(const Point& xy);
-//    virtual void draw(SDL_Renderer* rend);
     virtual void scroll(const Point& xy, int y);
-    virtual void drag(const Point& xy);
-    virtual void dragEnd();
 };
 
 // When Operator is dropped into the "module list" it should call saveScad() on self, 

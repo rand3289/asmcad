@@ -8,8 +8,6 @@ using namespace std;
 
 VerticalLayout::VerticalLayout(int width): FlowLayout(width) {}
 void VerticalLayout::scroll(const Point& xy, int y){}
-void VerticalLayout::drag(const Point& xy){}
-void VerticalLayout::dragEnd(){}
 
 void VerticalLayout::setLocation(const Point& xy){
     Object::setLocation(xy);
@@ -22,9 +20,7 @@ void VerticalLayout::setLocation(const Point& xy){
 }
 
 
-FlowLayout::FlowLayout(int width) {
-    loc.w = width;
-}
+FlowLayout::FlowLayout(int width) { loc.w = width; }
 
 void FlowLayout::setLocation(const Point& xy){
     Object::setLocation(xy);
@@ -32,17 +28,14 @@ void FlowLayout::setLocation(const Point& xy){
     for(auto& objPtr: children){
         int nextx = next.x+objPtr->loc.w;
         if(nextx > loc.x+loc.w){ // falls off the screen on the right
-            next.x = loc.x;
+            next.x = xy.x;
             next.y = next.y+ITEM_HEIGHT;
         }
         objPtr->setLocation(next);
-        next.x+=objPtr->loc.w;
+        next.x += objPtr->loc.w;
     }
-    loc.h = (next.y - loc.y)+ITEM_HEIGHT; // if we increased the size 
-}
-
-void FlowLayout::add(shared_ptr<Object>const & obj){
-    children.push_back(obj);
+    // TODO: this is wrong!!!
+    loc.h = (next.y - xy.y)+ITEM_HEIGHT; // if we increased the size 
 }
 
 bool FlowLayout::saveScad(ostream& file){
@@ -50,6 +43,10 @@ bool FlowLayout::saveScad(ostream& file){
         o->saveScad(file);
     }
     return true;
+}
+
+void FlowLayout::add(shared_ptr<Object>const & obj){
+    children.push_back(obj);
 }
 
 bool FlowLayout::removeChild(shared_ptr<Object>& obj){
@@ -83,14 +80,6 @@ shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
         }
     }
     return shared_ptr<Object>();
-}
-
-void FlowLayout::drag(const Point& xy){
-    cout << ".";
-}
-
-void FlowLayout::dragEnd(){
-    cout << "|";
 }
 
 bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){

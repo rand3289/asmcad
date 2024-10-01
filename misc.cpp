@@ -52,11 +52,11 @@ bool makeObjectImage(shared_ptr<Object>& obj){
 
 // returns a root object that gets rendered and renders all of its children
 std::shared_ptr<Object> initGui(int width, int height){
-    auto root   = make_shared<VerticalLayout>(width);
-    auto menu   = make_shared<FlowLayout>(width);     // top menu
-    auto level2 = make_shared<FlowLayout>(width);     // container for labels and main
-    auto labels = make_shared<VerticalLayout>(ITEM_WIDTH); // module pics
-    auto main   = make_shared<VerticalLayout>(width-ITEM_WIDTH); // main "code" area
+    auto root   = make_shared<VerticalLayout>(width, height, true);
+    auto menu   = make_shared<FlowLayout>(width,true); // top menu
+    auto level2 = make_shared<FlowLayout>(width,true); // container for labels and main
+    auto labels = make_shared<VerticalLayout>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
+    auto main   = make_shared<VerticalLayout>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
     auto dzView       = make_shared<DropZone>(DropZone::VIEW);
     auto union_       = make_shared<Operator>(width, Operator::UNION);

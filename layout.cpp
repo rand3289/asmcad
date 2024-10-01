@@ -76,6 +76,7 @@ shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
                 setLocation(Point(loc.x, loc.y)); // perform layout
                 return obj;
             }
+            if(disableDragDrop){ continue; }
             auto ptr = (*it);
             children.erase(it);
             cout << "Removing Object. children size=" << children.size() << endl;
@@ -91,10 +92,12 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
         if(xy.inRectangle(o->loc)){
             if(o->dropped(xy,obj) ){
                 setLocation(Point(loc.x,loc.y)); // perform layout
+                cout << "Added an object to one of the children." << endl;
                 return true;
             }
         }
     }
+    if(disableDragDrop){ return false; }
     addObject(obj);
     setLocation(Point(loc.x,loc.y)); // perform layout
     cout << "Added an object. children size=" << children.size() << endl;

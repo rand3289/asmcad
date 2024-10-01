@@ -39,12 +39,15 @@ struct Object: public std::enable_shared_from_this<Object>{
 
 // Flow layout will be used in top menu and to contain operators' children within "lines"
 // no scrolling. left-to-right layout
+// when window is resized, it resizes in width
 class FlowLayout: public Object {
 protected:
     std::vector<std::shared_ptr<Object>> children;
+    bool disableDragDrop = false;
 public:
-    FlowLayout(int width){ loc.w = width; }
+    FlowLayout(int width, bool disDragDrop=false): disableDragDrop(disDragDrop) { loc.w = width; }
     void addObject(std::shared_ptr<Object>const & obj);
+    void setWidth(int W){ loc.w = W; }
 
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
@@ -59,9 +62,12 @@ public:
 // fixed horizontal & vertical size. Changes only when main window is resized.
 // scrolls on up()/down() events
 // It can contain only Operator and Module objects
+// when window is resized, it resizes in width and height
 class VerticalLayout: public FlowLayout {
 public:
-    VerticalLayout(int width): FlowLayout(width) {}
+    VerticalLayout(int width, int height, bool disDragDrop=false): FlowLayout(width, disDragDrop){ loc.h = height; }
+    void setSize(int H, int W){ loc.h = H; loc.w = W; }
+
     virtual void setLocation(const Point& xy);
     virtual void scroll(const Point& xy, int y);
 };

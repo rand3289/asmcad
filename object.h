@@ -9,6 +9,7 @@
 #define ITEM_WIDTH 100
 
 struct Object: public std::enable_shared_from_this<Object>{
+    bool isClone = false;
     bool draggedOver = false;
     SDL_Rect loc; // location of the image
     SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr. Own it
@@ -28,7 +29,10 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual void scroll(const Point& xy, int y){} // mouse wheel scrolls in vertical direction
 
     // mouse started dragging within this object
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return std::shared_ptr<Object>(); }
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){
+        if(isClone) { return std::shared_ptr<Object>(); }
+        return clone(); // our system has a bizzare property where Objects can be cloned only once
+    }
     // another object is dragged accross this one
     virtual void drag(const Point& xy){ draggedOver = true; }
     virtual void dragEnd(){ draggedOver = false; }
@@ -81,7 +85,11 @@ public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
     Operator(int width, OperatorType ot);
     virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
+    virtual std::shared_ptr<Object> clone(){
+        auto obj = std::make_shared<Operator>(loc.w, type);
+        obj->isClone = true;
+        return obj;
+    }
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -108,7 +116,11 @@ public:
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
+    virtual std::shared_ptr<Object> clone(){
+        auto obj = std::make_shared<Modifier>(type);
+        obj->isClone = true;
+        return obj;
+    }
 };
 
 // These are VIEW and DELETE zones in the upper corners
@@ -135,7 +147,11 @@ public:
     Shape(ShapeType st);
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
+    virtual std::shared_ptr<Object> clone(){
+        auto obj = std::make_shared<Shape>(type);
+        obj->isClone = true;
+        return obj;
+    }
 };
 
 // Graphical representation (picture) of an Operator and all its children
@@ -143,7 +159,6 @@ public:
 class Module: public Object { // does not have children
     std::weak_ptr<Object> parent;
 public:
-    Module(std::shared_ptr<Object> parenT): parent(parenT) {}
+    Module(std::shared_ptr<Object> parenT): parent(parenT) { isClone = true; }
     virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
 };

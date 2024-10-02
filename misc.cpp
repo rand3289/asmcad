@@ -85,6 +85,6 @@ std::shared_ptr<Object> initGui(int width, int height){
     menu->addObject(sphere);
     menu->addObject(dzDelete);
 
-    root->setLocation(Point(0,0));
+    root->setLocation(Point(0,0)); // perform layout
     return root;
 }

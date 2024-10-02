@@ -81,6 +81,7 @@ public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
     Operator(int width, OperatorType ot);
     virtual bool saveScad(std::ostream& file);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -107,6 +108,7 @@ public:
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
 };
 
 // These are VIEW and DELETE zones in the upper corners
@@ -133,6 +135,7 @@ public:
     Shape(ShapeType st);
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
 };
 
 // Graphical representation (picture) of an Operator and all its children
@@ -142,4 +145,5 @@ class Module: public Object { // does not have children
 public:
     Module(std::shared_ptr<Object> parenT): parent(parenT) {}
     virtual bool saveScad(std::ostream& file);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return shared_from_this(); }
 };

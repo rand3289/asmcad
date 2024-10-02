@@ -6,17 +6,19 @@
 using namespace std;
 
 
-void VerticalLayout::scroll(const Point& xy, int y){}
+void VerticalLayout::scroll(const Point& xy, int y){
+    cout << y << " ";
+    cout.flush();
+}
 
 void VerticalLayout::setLocation(const Point& xy){
     cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<")"<< endl;
     Object::setLocation(xy);
-    Point current = xy;
-    for(auto objPtr: children){
-        objPtr->setLocation(current);
-        current.y+= objPtr->loc.h;
+    Point next = xy;
+    for(auto& objPtr: children){
+        objPtr->setLocation(next);
+        next.y+= objPtr->loc.h;
     }
-    loc.h = current.y - xy.y;
 }
 
 
@@ -25,16 +27,16 @@ void FlowLayout::setLocation(const Point& xy){
     Object::setLocation(xy);
     Point next = xy;
     for(auto& objPtr: children){
-        int nextx = next.x+objPtr->loc.w;
-        if(nextx > loc.x+loc.w){ // falls off the screen on the right
+        int xmax = next.x+objPtr->loc.w;
+        if(xmax > loc.x+loc.w){ // falls off the screen on the right
             next.x = xy.x;
-            next.y = next.y+ITEM_HEIGHT;
+            next.y = next.y+ITEM_HEIGHT; // TODO: this is wrong
         }
         objPtr->setLocation(next);
         next.x += objPtr->loc.w;
     }
     // TODO: this is wrong!!!
-    loc.h = (next.y - xy.y)+ITEM_HEIGHT; // if we increased the size 
+    loc.h = (next.y - xy.y); // if we increased the size 
 }
 
 bool FlowLayout::saveScad(ostream& file){

@@ -30,7 +30,7 @@ struct Object: public std::enable_shared_from_this<Object>{
 
     // mouse started dragging within this object
     virtual std::shared_ptr<Object> takeObject(const Point& xy){
-        if(isClone) { return std::shared_ptr<Object>(); }
+        if(isClone) { return shared_from_this(); }
         return clone(); // our system has a bizzare property where Objects can be cloned only once
     }
     // another object is dragged accross this one
@@ -42,9 +42,8 @@ struct Object: public std::enable_shared_from_this<Object>{
 
 void randomColor(SDL_Color& color);
 
-// Flow layout will be used in top menu and to contain operators' children within "lines"
-// no scrolling. left-to-right layout
-// when window is resized, it resizes in width
+// Left-to-right flow layout without scrolling.
+// Used in top menu and to contain operators' children
 class FlowLayout: public Object {
 protected:
     std::vector<std::shared_ptr<Object>> children;
@@ -53,13 +52,10 @@ protected:
 public:
     FlowLayout(int width, bool disDragDrop=false): disableDragDrop(disDragDrop) { loc.w = width; randomColor(color); }
     void addObject(std::shared_ptr<Object>const & obj);
-//    void setWidth(int W){ loc.w = W; }
-
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
     virtual bool removeChild(std::shared_ptr<Object>& obj);
     virtual void draw(SDL_Renderer* rend);
-
     virtual std::shared_ptr<Object> takeObject(const Point& xy);
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
@@ -67,15 +63,14 @@ public:
 // Vertical Layout will be used in the main frame as "lines" to contain Operator and in the MODULE list
 // fixed horizontal & vertical size. Changes only when main window is resized.
 // scrolls on up()/down() events
-// It can contain only Operator and Module objects
+// It can contain FlowLayout, Operator and Module
 // when window is resized, it resizes in width and height
 class VerticalLayout: public FlowLayout {
 public:
     VerticalLayout(int width, int height, bool disDragDrop=false): FlowLayout(width, disDragDrop){ loc.h = height; }
-//    void setSize(int H, int W){ loc.h = H; loc.w = W; }
-
     virtual void setLocation(const Point& xy);
     virtual void scroll(const Point& xy, int y);
+//    void setSize(int H, int W){ loc.h = H; loc.w = W; }
 };
 
 // When Operator is dropped into the "module list" it should call saveScad() on self, 

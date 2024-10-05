@@ -25,17 +25,19 @@ void VerticalLayout::setLocation(const Point& xy){
 void FlowLayout::setLocation(const Point& xy){
     Object::setLocation(xy);
     Point next = xy;
+    int rowHeight = 0;
     for(auto& objPtr: children){
+        rowHeight = max(rowHeight, objPtr->loc.h);
         int xmax = next.x+objPtr->loc.w;
         if(xmax-2 > loc.x+loc.w){ // falls off the screen on the right
             next.x = xy.x;
-            next.y = next.y+ITEM_HEIGHT; // TODO: this is wrong!!!
+            next.y = next.y+rowHeight;
+            rowHeight = objPtr->loc.h;
         }
         objPtr->setLocation(next);
         next.x += objPtr->loc.w;
     }
-    // TODO: this is wrong!!!
-    loc.h = (next.y - xy.y)+ITEM_HEIGHT; // if it increased in size 
+    loc.h = (next.y - xy.y)+rowHeight; // if it increased in size 
     cout << "HLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
 }
 

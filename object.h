@@ -39,7 +39,6 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj){ return false; }
 };
 
-void randomColor(SDL_Color& color);
 
 // Left-to-right flow layout without scrolling.
 // Used in top menu and to contain operators' children
@@ -47,9 +46,8 @@ class FlowLayout: public Object {
 protected:
     std::vector<std::shared_ptr<Object>> children;
     bool disableDragDrop = false;
-    SDL_Color color;
 public:
-    FlowLayout(int width, bool disDragDrop=false): disableDragDrop(disDragDrop) { loc.w = width; randomColor(color); }
+    FlowLayout(int width, bool disDragDrop=false): disableDragDrop(disDragDrop) { loc.w = width; }
     void addObject(std::shared_ptr<Object>const & obj);
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);

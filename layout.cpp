@@ -59,16 +59,7 @@ bool FlowLayout::removeChild(shared_ptr<Object>& obj){
     return true;
 }
 
-void randomColor(SDL_Color& color){
-    color.a = 255;
-    color.r = rand() % 256;
-    color.g = rand() % 256;
-    color.b = rand() % 256;
-}
-
 void FlowLayout::draw(SDL_Renderer* rend){
-    SDL_SetRenderDrawColor(rend, color.r, color.g, color.b, color.a);
-    SDL_RenderFillRect(rend, &loc);
     for(auto& objPtr: children){
         objPtr->draw(rend);
     }

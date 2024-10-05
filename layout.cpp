@@ -101,12 +101,15 @@ shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
 }
 
 bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
+    if( ! xy.inRectangle(loc)){ return false; }
     for(auto& o: children){
         if(xy.inRectangle(o->loc)){
             if(o->dropped(xy,obj) ){
                 setLocation(Point(loc.x,loc.y)); // perform layout
                 cout << "Added an object to one of the children." << endl;
                 return true;
+//            } else {
+//                return false;
             }
         }
     }

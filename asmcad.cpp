@@ -62,6 +62,9 @@ int main(int argc, char* argv[]){
                     SDL_GetMouseState(&xy.x, &xy.y);
                     if(!draggedObject){
                         draggedObject = root->takeObject(xy);
+                        if(!draggedObject){     // if this object can not be dragged
+                            buttonDown = false; // end drag
+                        }
                     }
                     root->drag(xy);
                     break;

@@ -72,6 +72,27 @@ public:
 //    void setSize(int H, int W){ loc.h = H; loc.w = W; }
 };
 
+
+struct Labels: public VerticalLayout {
+    Labels(int width, int height): VerticalLayout(width, height){}
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+};
+
+struct Main: public VerticalLayout {
+    Main(int width, int height): VerticalLayout(width, height){}
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+};
+
+// Graphical representation (picture) of an Operator and all its children
+// This is an equivalent of OpenScad's module
+class Module: public Object { // does not have children
+    std::weak_ptr<Object> parent;
+public:
+    Module(std::shared_ptr<Object> const & parenT): parent(parenT) { isClone = true; }
+    virtual bool saveScad(std::ostream& file);
+};
+
+
 // When Operator is dropped into the "module list" it should call saveScad() on self, 
 // then generate an image from saved text and then call module->setImage()
 class Operator: public Object {
@@ -85,6 +106,16 @@ public:
         auto obj = std::make_shared<Operator>(loc.w, type);
         obj->isClone = true;
         return obj;
+    }
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj){
+        return layout.dropped(xy,obj);
+    }
+    std::shared_ptr<Object> getModule(){
+        if(!module){ module = std::make_shared<Module>(shared_from_this()); }
+        if( !makeObjectImage( module ) ){
+            std::cout << "ERROR while creating module image." << std::endl;
+        }
+        return module;
     }
 };
 
@@ -148,13 +179,4 @@ public:
         obj->isClone = true;
         return obj;
     }
-};
-
-// Graphical representation (picture) of an Operator and all its children
-// This is an equivalent of OpenScad's module
-class Module: public Object { // does not have children
-    std::weak_ptr<Object> parent;
-public:
-    Module(std::shared_ptr<Object> parenT): parent(parenT) { isClone = true; }
-    virtual bool saveScad(std::ostream& file);
 };

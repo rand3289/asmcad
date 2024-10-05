@@ -123,3 +123,30 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
     cout << "Added an object. children size=" << children.size() << endl;
     return true;
 }
+
+
+bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
+    auto op = dynamic_pointer_cast<Operator>(obj);
+    if(!op){
+        cout << "Object is not an operator." << endl;
+        return false; 
+    }
+    auto module = op->getModule();
+    addObject(module);
+    setLocation(Point(loc.x, loc.y));
+    cout << "Added a label to Labels." << endl;
+    return true;
+}
+
+
+bool Main::dropped(const Point& xy, shared_ptr<Object>const & obj){
+    auto op = dynamic_pointer_cast<Operator>(obj);
+    if(!op){
+        cout << "Object is not an operator." << endl;
+        return false;
+    }
+    addObject(obj);
+    setLocation(Point(loc.x, loc.y));
+    cout << "Added an Operator to Main." << endl;
+    return true;
+}

@@ -4,7 +4,7 @@
 #include <memory>
 
 class Object;
-bool makeObjectImage(std::shared_ptr<Object>& obj); // makes an image of an Operator and set its corresponding Label
+bool makeObjectImage(std::shared_ptr<Object> const & obj); // makes an image of an Operator and set its corresponding Label
 std::shared_ptr<Object> initGui(int width, int height); // initialize layout of the application's GUI
 
 

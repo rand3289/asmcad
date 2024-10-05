@@ -28,7 +28,7 @@ const string TMP_FILE_SCAD = "tmp.scad";
 const string TMP_FILE_IMG = "tmp.png";
 
 
-bool makeObjectImage(shared_ptr<Object>& obj){
+bool makeObjectImage(shared_ptr<Object> const & obj){
     // save openscad code from a module/operator to a temp file
     ofstream file(TMP_FILE_SCAD);
     if(!obj->saveScad(file)){
@@ -56,8 +56,8 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto root   = make_shared<VerticalLayout>(width, height, true);
     auto menu   = make_shared<FlowLayout>(width,true); // top menu
     auto level2 = make_shared<FlowLayout>(width,true); // container for labels and main
-    auto labels = make_shared<VerticalLayout>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
-    auto main   = make_shared<VerticalLayout>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
+    auto labels = make_shared<Labels>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
+    auto main   = make_shared<Main>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
     auto dzView       = make_shared<DropZone>(DropZone::VIEW);
     auto union_       = make_shared<Operator>(width, Operator::UNION);

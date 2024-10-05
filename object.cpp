@@ -28,7 +28,14 @@ void Object::draw(SDL_Renderer* rend){
 }
 
 
-bool Module::saveScad(ostream& file){ return true; }
+// Module does not have any openscad code.  It's parent Operator has the code.
+bool Module::saveScad(ostream& file){
+    auto sp = parent.lock();
+    if(sp){
+        return sp->saveScad(file);
+    }
+    return false;
+}
 
 
 bool Input::saveScad(ostream& file){

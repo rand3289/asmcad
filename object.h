@@ -30,8 +30,7 @@ struct Object: public std::enable_shared_from_this<Object>{
 
     // mouse started dragging within this object
     virtual std::shared_ptr<Object> takeObject(const Point& xy){
-        if(isClone) { return shared_from_this(); }
-        return clone(); // our system has a bizzare property where Objects can be cloned only once
+         return isClone ? shared_from_this() : clone(); // our system has a bizzare property where Objects can be cloned only once
     }
     // another object is dragged accross this one
     virtual void drag(const Point& xy){ draggedOver = true; }
@@ -129,11 +128,11 @@ class DropZone: public Object { // does not have children
 public:
     enum DZType {VIEW, DELETE} type;
     DropZone(DZType dzt): type(dzt) {
-        loc.w = ITEM_WIDTH*2; 
         img = ImageLoader::getImage( VIEW == type ? "img/view.png" : "img/delete.png");
     }
     virtual bool saveScad(std::ostream& file){ return true; }
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return std::shared_ptr<Object>(); }
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere

@@ -87,11 +87,5 @@ std::shared_ptr<Object> initGui(int width, int height){
     menu->addObject(dzDelete);
 
     root->setLocation(Point(0,0)); // perform layout
-// TODO: debugging only
-    cout << "root ("<< root->loc.w << "," << root->loc.h << ")" << endl;
-    cout << "menu ("<< menu->loc.w << "," << menu->loc.h << ")" << endl;
-    cout << "level2 ("<< level2->loc.w << "," << level2->loc.h << ")" << endl;
-    cout << "labels ("<< labels->loc.w << "," << labels->loc.h << ")" << endl;
-    cout << "main ("<< main->loc.w << "," << main->loc.h << ")" << endl;
     return root;
 }

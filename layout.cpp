@@ -85,14 +85,18 @@ shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
         if(xy.inRectangle((*it)->loc)){
             auto obj = (*it)->takeObject(xy); // take from its children
             if(obj){
+                if(*it == obj){ // it is the child itself
+                    children.erase(it);
+                }
                 cout << "Removing an object from one of the children. children size=" << children.size() <<endl;
                 setLocation(Point(loc.x, loc.y)); // perform layout
                 return obj;
             }
-            if(disableDragDrop){ continue; }
+            if(disableDragDrop){ return shared_ptr<Object>(); }
             auto ptr = (*it);
+            cout << "Removing Object.  Children size=" << children.size() << endl;
             children.erase(it);
-            cout << "Removing Object. children size=" << children.size() << endl;
+            cout << "Revoved Object.  Children size=" << children.size() << endl;
             setLocation(Point(loc.x, loc.y)); // perform layout
             return ptr;
         }

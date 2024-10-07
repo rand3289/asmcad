@@ -127,9 +127,10 @@ bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
         return false; 
     }
     auto module = op->getModule();
+    // TODO: check if it is already in the list
     addObject(module);
     setLocation(Point(loc.x, loc.y));
-    cout << "Added a label to Labels." << endl;
+    cout << "Added a label to Labels at "<< loc.x << "," << loc.y << endl;
     return true;
 }
 

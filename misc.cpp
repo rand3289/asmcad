@@ -63,11 +63,12 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto union_       = make_shared<Operator>(Operator::UNION);
     auto difference   = make_shared<Operator>(Operator::DIFFERENCE);
     auto intersection = make_shared<Operator>(Operator::INTERSECTION);
-    auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
-    auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
     auto cube         = make_shared<Shape>(Shape::CUBE);
     auto cylinder     = make_shared<Shape>(Shape::CYLINDER);
     auto sphere       = make_shared<Shape>(Shape::SPHERE);
+    auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
+    auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
+    auto custom       = make_shared<Custom>();
     auto dzDelete     = make_shared<DropZone>(DropZone::DELETE); // TODO: pass labels and main in constructor
 
     root  ->addObject(menu);
@@ -79,11 +80,12 @@ std::shared_ptr<Object> initGui(int width, int height){
     menu->addObject(union_);
     menu->addObject(difference);
     menu->addObject(intersection);
-    menu->addObject(translate);
-    menu->addObject(rotate);
     menu->addObject(cube);
     menu->addObject(cylinder);
     menu->addObject(sphere);
+    menu->addObject(translate);
+    menu->addObject(rotate);
+    menu->addObject(custom);
     menu->addObject(dzDelete);
 
     root->setLocation(Point(0,0)); // perform layout

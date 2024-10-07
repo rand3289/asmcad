@@ -159,3 +159,8 @@ public:
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();
 };
+
+struct Custom: public Object {
+    Custom(){ img = ImageLoader::getImage("img/custom.png"); }
+    virtual bool saveScad(std::ostream& file){ return true; }
+};

@@ -118,7 +118,6 @@ public:
     virtual void click(const Point& xy){ delta = 1.0; }
     virtual void clickr(const Point& xy){ delta = 0.01; } // change it slowly after right click
     virtual bool saveScad(std::ostream& file);
-    double getVal(){ return value; }
 };
 
 // translate/rotate

@@ -42,7 +42,7 @@ bool Module::saveScad(ostream& file){
 
 
 bool Input::saveScad(ostream& file){
-    cout << value;
+    file << value;
     return true;
 }
 void Input::draw(SDL_Renderer* rend){
@@ -57,7 +57,13 @@ Modifier::Modifier(ModifierType mt): type(mt) {
 
 bool Modifier::saveScad(ostream& file){
     file << (ROTATE==type ? "rotate" : "translate");
-    file << "([" << x.getVal() << "," << y.getVal() << "," << z.getVal() << "]) ";
+    file << "([";
+    x.saveScad(file);
+    file << ",";
+    y.saveScad(file);
+    file << ",";
+    z.saveScad(file);
+    file << "]) ";
     return true;
 }
 
@@ -95,9 +101,24 @@ Shape::Shape(ShapeType st): type(st) {
 
 bool Shape::saveScad(ostream& file){
     switch(type){
-        case CUBE: file << "cube([" << a.getVal() << "," << b.getVal() << "," << c.getVal() << "],center=true);" << endl; break;
-        case CYLINDER: file << "cylinder(d=" << a.getVal() << ",h=" << b.getVal() << ",center=true);" << endl; break;
-        case SPHERE: file << "sphere(d=" << a.getVal() << ");" << endl; break;
+        case CUBE: file << "cube([";
+            a.saveScad(file);
+            file << ",";
+            b.saveScad(file);
+            file << ",";
+            c.saveScad(file);
+            file << "],center=true);" << endl; 
+            break;
+        case CYLINDER: file << "cylinder(d=";
+            a.saveScad(file);
+            file << ",h=";
+            b.saveScad(file);
+            file << ",center=true);" << endl;
+            break;
+        case SPHERE: file << "sphere(d=";
+            a.saveScad(file);
+            file << ");" << endl;
+            break;
         default: break;
     }
     return true;

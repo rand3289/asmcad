@@ -6,23 +6,6 @@
 using namespace std;
 
 
-void VerticalLayout::scroll(const Point& xy, int y){
-    cout << y << " ";
-    cout.flush();
-}
-
-void VerticalLayout::setLocation(const Point& xy){
-    Object::setLocation(xy);
-    Point next = xy;
-    for(auto& objPtr: children){
-        objPtr->setLocation(next);
-        next.y+= objPtr->loc.h;
-    }
-//    cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
-    cout << '|';
-}
-
-
 void FlowLayout::setLocation(const Point& xy){
     Object::setLocation(xy);
     Point next = xy;
@@ -118,9 +101,28 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
 }
 
 
+/*************************************************************************/
+
+void VerticalLayout::scroll(const Point& xy, int y){
+    cout << y << " ";
+    cout.flush();
+}
+
+void VerticalLayout::setLocation(const Point& xy){
+    Object::setLocation(xy);
+    Point next = xy;
+    for(auto& objPtr: children){
+        objPtr->setLocation(next);
+        next.y+= objPtr->loc.h;
+    }
+//    cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
+    cout << '|';
+}
+
+
 bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
     auto op = dynamic_pointer_cast<Operator>(obj);
-    if(!op){
+    if(!op || !op->isClone){
         cout << "Object is not an operator." << endl;
         return false; 
     }

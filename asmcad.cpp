@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
 //    SDL_DisplayMode dm;
 //    SDL_GetCurrentDisplayMode(0, &dm);
 
-    const int SCREEN_WIDTH = 1024;
+    const int SCREEN_WIDTH = 1000;
     const int SCREEN_HEIGHT = 768;
     const int WINPOS = SDL_WINDOWPOS_CENTERED;
     SDL_Window* window=SDL_CreateWindow("ASM CAD", WINPOS, WINPOS, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);

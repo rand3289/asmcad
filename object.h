@@ -62,8 +62,7 @@ public:
 // scrolls on up()/down() events
 // It can contain FlowLayout, Operator and Module
 // when window is resized, it resizes in width and height
-class VerticalLayout: public FlowLayout {
-public:
+struct VerticalLayout: public FlowLayout {
     VerticalLayout(int width, int height, bool disDragDrop=false): FlowLayout(width, disDragDrop){ loc.h = height; }
     virtual void setLocation(const Point& xy);
     virtual void scroll(const Point& xy, int y);
@@ -98,23 +97,12 @@ class Operator: public Object {
     FlowLayout layout;
 public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
-    Operator(int width, OperatorType ot);
+    Operator(OperatorType ot);
     virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> clone(){
-        auto obj = std::make_shared<Operator>(loc.w, type);
-        obj->isClone = true;
-        return obj;
-    }
-    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj){
-        return layout.dropped(xy,obj);
-    }
-    std::shared_ptr<Object> getModule(){
-        if(!module){ module = std::make_shared<Module>(shared_from_this()); }
-        if( !makeObjectImage( module ) ){
-            std::cout << "ERROR while creating module image." << std::endl;
-        }
-        return module;
-    }
+    virtual std::shared_ptr<Object> clone();
+    virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual void setLocation(const Point& xy);
+    std::shared_ptr<Object> getModule();
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -141,11 +129,7 @@ public:
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual void setLocation(const Point& xy);
-    virtual std::shared_ptr<Object> clone(){
-        auto obj = std::make_shared<Modifier>(type);
-        obj->isClone = true;
-        return obj;
-    }
+    virtual std::shared_ptr<Object> clone();
 };
 
 // These are VIEW and DELETE zones in the upper corners
@@ -172,9 +156,5 @@ public:
     Shape(ShapeType st);
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> clone(){
-        auto obj = std::make_shared<Shape>(type);
-        obj->isClone = true;
-        return obj;
-    }
+    virtual std::shared_ptr<Object> clone();
 };

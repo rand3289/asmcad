@@ -79,18 +79,11 @@ void Modifier::draw(SDL_Renderer* rend){
 }
 
 
-
-Operator::Operator(int width, OperatorType ot): layout(width), type(ot){
-    string imgFileName;
-    switch(type){
-        case UNION: imgFileName = "img/union.png"; break;
-        case DIFFERENCE: imgFileName = "img/difference.png"; break;
-        case INTERSECTION: imgFileName = "img/intersection.png"; break;
-    }
-    img = ImageLoader::getImage(imgFileName); 
+std::shared_ptr<Object> Modifier::clone(){
+    auto obj = std::make_shared<Modifier>(type);
+    obj->isClone = true;
+    return obj;
 }
-
-bool Operator::saveScad(ostream& file){ return true; }
 
 
 Shape::Shape(ShapeType st): type(st) {
@@ -107,6 +100,11 @@ void Shape::draw(SDL_Renderer* rend){
     Object::draw(rend);
     // TODO: draw inputs a,b,c
 }
+std::shared_ptr<Object> Shape::clone(){
+    auto obj = std::make_shared<Shape>(type);
+    obj->isClone = true;
+    return obj;
+}
 
 
 bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
@@ -117,4 +115,50 @@ bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
         // TODO: remove the object from main view, module view and DropZoneView
     }
     return true;
+}
+
+/************************* Operator *********************/
+Operator::Operator(OperatorType ot): layout(0), type(ot){
+    string imgFileName;
+    switch(type){
+        case UNION: imgFileName = "img/union.png"; break;
+        case DIFFERENCE: imgFileName = "img/difference.png"; break;
+        case INTERSECTION: imgFileName = "img/intersection.png"; break;
+    }
+    img = ImageLoader::getImage(imgFileName); 
+}
+
+bool Operator::saveScad(ostream& file){ return true; }
+
+
+std::shared_ptr<Object> Operator::clone(){
+    auto obj = std::make_shared<Operator>(type);
+    obj->isClone = true;
+    return obj;
+}
+
+bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
+    // TODO: check if xy is in loc?
+    layout.addObject(obj);
+    layout.setLocation(Point(loc.x+ITEM_WIDTH*(module?2:1), loc.y));
+    return true;
+}
+
+std::shared_ptr<Object> Operator::getModule(){ // not virtual
+    if(!module){ module = std::make_shared<Module>(shared_from_this()); }
+    if( !makeObjectImage( module ) ){
+        std::cout << "ERROR while creating module image." << std::endl;
+    }
+    return module;
+}
+
+void Operator::setLocation(const Point& xy){
+    Object::setLocation(xy);
+    loc.w = ITEM_WIDTH;
+    if(module){
+        module->setLocation(Point(xy.x+ITEM_WIDTH,xy.y));
+        loc.w = ITEM_WIDTH+module->loc.w;
+    }
+    layout.setLocation(Point(xy.x+2*ITEM_WIDTH,xy.y));
+    loc.w += layout.loc.w;
 }

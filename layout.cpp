@@ -76,9 +76,9 @@ shared_ptr<Object> FlowLayout::takeObject(const Point& xy){
         if(xy.inRectangle((*it)->loc)){
             auto obj = (*it)->takeObject(xy); // take from its children
             if(obj){
-                if(*it == obj){ // it is the child itself
-                    children.erase(it);
-                }
+//                if(*it == obj){ // it is the child itself
+//                    children.erase(it);
+//                }
                 cout << "Removing an object from one of the children. children size=" << children.size() <<endl;
                 setLocation(Point(loc.x, loc.y)); // perform layout
                 return obj;
@@ -131,6 +131,12 @@ bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
 
 
 bool Main::dropped(const Point& xy, shared_ptr<Object>const & obj){
+    for(auto& o: children){
+        if(xy.inRectangle(o->loc) && o->dropped(xy,obj) ){
+            setLocation(Point(loc.x, loc.y));
+            return true;
+        }
+    }
     auto op = dynamic_pointer_cast<Operator>(obj);
     if(!op){
         cout << "Object is not an operator." << endl;

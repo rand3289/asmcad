@@ -60,9 +60,9 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto main   = make_shared<Main>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
     auto dzView       = make_shared<DropZone>(DropZone::VIEW);
-    auto union_       = make_shared<Operator>(width, Operator::UNION);
-    auto difference   = make_shared<Operator>(width, Operator::DIFFERENCE);
-    auto intersection = make_shared<Operator>(width, Operator::INTERSECTION);
+    auto union_       = make_shared<Operator>(Operator::UNION);
+    auto difference   = make_shared<Operator>(Operator::DIFFERENCE);
+    auto intersection = make_shared<Operator>(Operator::INTERSECTION);
     auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
     auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
     auto cube         = make_shared<Shape>(Shape::CUBE);

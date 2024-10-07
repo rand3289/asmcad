@@ -23,7 +23,6 @@ SDL_Texture* ImageLoader::getImage(const string& filename){
 }
 
 
-const string OUTPUT_FILE_SCAD = "asm.scad";
 const string TMP_FILE_SCAD = "tmp.scad";
 const string TMP_FILE_IMG = "tmp.png";
 

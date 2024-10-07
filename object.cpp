@@ -1,9 +1,12 @@
 #include <SDL2/SDL.h> // Simple Directmedia Layer lib has to be installed
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include "misc.h"
 #include "object.h"
 using namespace std;
+const string OUTPUT_FILE_SCAD = "asm.scad";
+
 
 Object::Object(): img(nullptr) {
     loc.x=0;
@@ -78,7 +81,6 @@ void Modifier::draw(SDL_Renderer* rend){
     // TODO: draw inputs x,y,z
 }
 
-
 std::shared_ptr<Object> Modifier::clone(){
     auto obj = std::make_shared<Modifier>(type);
     obj->isClone = true;
@@ -108,16 +110,25 @@ std::shared_ptr<Object> Shape::clone(){
 
 
 bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
-    if(VIEW == type){
-        // TODO: call makeObjectImage() if an operator without a Module was dropped
-        // saveScad on the Operator into OUTPUT_FILE_SCAD
+    if(VIEW == type){ // if Module or Operator are dropped, generate code
+        shared_ptr<Object> mod = dynamic_pointer_cast<Module>(obj);
+        auto op = dynamic_pointer_cast<Operator>(obj);
+        if(op){
+            mod = op->getModule();
+        }
+        if(mod){
+            img = mod->img;
+            ofstream file(OUTPUT_FILE_SCAD, ios_base::out);
+            mod->saveScad(file);
+        }
     } else {
         // TODO: remove the object from main view, module view and DropZoneView
     }
     return true;
 }
 
-/************************* Operator *********************/
+
+/******************************** Operator *****************************************/
 Operator::Operator(OperatorType ot): layout(0), type(ot){
     string imgFileName;
     switch(type){
@@ -139,7 +150,9 @@ std::shared_ptr<Object> Operator::clone(){
 
 bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     // TODO: check if xy is in loc?
+    cout << "Adding an object to an operator." << endl;
     layout.addObject(obj);
+    layout.loc.w += ITEM_WIDTH; // TODO: this is wrong
     layout.setLocation(Point(loc.x+ITEM_WIDTH*(module?2:1), loc.y));
     return true;
 }
@@ -156,9 +169,21 @@ void Operator::setLocation(const Point& xy){
     Object::setLocation(xy);
     loc.w = ITEM_WIDTH;
     if(module){
-        module->setLocation(Point(xy.x+ITEM_WIDTH,xy.y));
-        loc.w = ITEM_WIDTH+module->loc.w;
+        module->setLocation( Point(xy.x+ITEM_WIDTH, xy.y) );
+        loc.w += module->loc.w;
     }
-    layout.setLocation(Point(xy.x+2*ITEM_WIDTH,xy.y));
+    layout.setLocation(Point(xy.x+ITEM_WIDTH*(module?2:1), xy.y));
     loc.w += layout.loc.w;
+}
+
+void Operator::draw(SDL_Renderer* rend){
+    SDL_RenderCopy(rend, img, NULL, &loc);
+    if(draggedOver){
+        SDL_SetRenderDrawColor(rend,255,0,0,255);
+    } else {
+        SDL_SetRenderDrawColor(rend,255,255,255,255);
+    }
+    SDL_RenderDrawRect(rend, &loc);
+    if(module){ module->draw(rend); }
+    layout.draw(rend);
 }

@@ -102,6 +102,7 @@ public:
     virtual std::shared_ptr<Object> clone();
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
     virtual void setLocation(const Point& xy);
+    virtual void draw(SDL_Renderer* rend);
     std::shared_ptr<Object> getModule();
 };
 

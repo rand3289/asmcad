@@ -56,13 +56,8 @@ Modifier::Modifier(ModifierType mt): type(mt) {
 }
 
 bool Modifier::saveScad(ostream& file){
-    file << (ROTATE==type ? "rotate([" : "translate([");
-    x.saveScad(file);
-    file << ",";
-    y.saveScad(file);
-    file << ",";
-    z.saveScad(file);
-    file << "]) ";
+    file << (ROTATE==type ? "rotate" : "translate");
+    file << "([" << x.getVal() << "," << y.getVal() << "," << z.getVal() << "]) ";
     return true;
 }
 
@@ -97,7 +92,17 @@ Shape::Shape(ShapeType st): type(st) {
     }
     img = ImageLoader::getImage(imgFileName); 
 }
-bool Shape::saveScad(ostream& file){ return true; }
+
+bool Shape::saveScad(ostream& file){
+    switch(type){
+        case CUBE: file << "cube([" << a.getVal() << "," << b.getVal() << "," << c.getVal() << "],center=true);" << endl; break;
+        case CYLINDER: file << "cylinder(d=" << a.getVal() << ",h=" << b.getVal() << ",center=true);" << endl; break;
+        case SPHERE: file << "sphere(d=" << a.getVal() << ");" << endl; break;
+        default: break;
+    }
+    return true;
+}
+
 void Shape::draw(SDL_Renderer* rend){
     Object::draw(rend);
     // TODO: draw inputs a,b,c
@@ -139,7 +144,21 @@ Operator::Operator(OperatorType ot): layout(0), type(ot){
     img = ImageLoader::getImage(imgFileName); 
 }
 
-bool Operator::saveScad(ostream& file){ return true; }
+bool Operator::saveScad(ostream& file){
+    if(module){
+        file << "module mod" << module.get() << "(){" << endl;
+    }
+    switch(type){
+        case UNION: file << "union(){" << endl; break;
+        case DIFFERENCE: file << "difference(){" << endl; break;
+        case INTERSECTION: file << "intersection(){" << endl; break;
+        default: break;
+    }
+    layout.saveScad(file);
+    file << "}" << endl; // close operator
+    if(module){ file << "}" << endl << endl << "mod" << module.get() << "();" << endl; }
+    return true;
+}
 
 
 std::shared_ptr<Object> Operator::clone(){
@@ -177,13 +196,19 @@ void Operator::setLocation(const Point& xy){
 }
 
 void Operator::draw(SDL_Renderer* rend){
-    SDL_RenderCopy(rend, img, NULL, &loc);
+    SDL_Rect r;  // TODO: do this better
+    r.x = loc.x;
+    r.y = loc.y;
+    r.w = ITEM_WIDTH;
+    r.h = ITEM_HEIGHT;
+    SDL_RenderCopy(rend, img, NULL, &r);
+    if(module){ module->draw(rend); }
+    layout.draw(rend);
+
     if(draggedOver){
         SDL_SetRenderDrawColor(rend,255,0,0,255);
     } else {
         SDL_SetRenderDrawColor(rend,255,255,255,255);
     }
     SDL_RenderDrawRect(rend, &loc);
-    if(module){ module->draw(rend); }
-    layout.draw(rend);
 }

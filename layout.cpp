@@ -18,7 +18,8 @@ void VerticalLayout::setLocation(const Point& xy){
         objPtr->setLocation(next);
         next.y+= objPtr->loc.h;
     }
-    cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
+//    cout << "VLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
+    cout << '|';
 }
 
 
@@ -38,7 +39,8 @@ void FlowLayout::setLocation(const Point& xy){
         next.x += objPtr->loc.w;
     }
     loc.h = (next.y - xy.y)+rowHeight; // if it increased in size 
-    cout << "HLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
+//    cout << "HLayout setting location at ("<< xy.x << ","<<xy.y<<") size (" << loc.w << "," << loc.h << ")" << endl;
+    cout << '_';
 }
 
 bool FlowLayout::saveScad(ostream& file){

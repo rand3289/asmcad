@@ -113,11 +113,12 @@ class Input: public Object {  // does not have children
     double value;
     double delta;
 public:
-    Input(): value(0), delta(1.0) {}
+    Input(): value(10), delta(1.0) {}
     virtual void draw(SDL_Renderer* rend);
     virtual void click(const Point& xy){ delta = 1.0; }
     virtual void clickr(const Point& xy){ delta = 0.01; } // change it slowly after right click
     virtual bool saveScad(std::ostream& file);
+    double getVal(){ return value; }
 };
 
 // translate/rotate

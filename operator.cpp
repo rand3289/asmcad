@@ -57,13 +57,9 @@ std::shared_ptr<Object> Operator::getModule(){ // not virtual
 
 void Operator::setLocation(const Point& xy){
     Object::setLocation(xy);
-    loc.w = ITEM_WIDTH;
-    if(module){
-        module->setLocation( Point(xy.x+ITEM_WIDTH, xy.y) );
-        loc.w += module->loc.w;
-    }
-    layout.setLocation(Point(xy.x+ITEM_WIDTH*(module?2:1), xy.y));
-    loc.w += layout.loc.w;
+    layout.setLocation(Point(xy.x+ITEM_WIDTH, xy.y));
+    loc.w = ITEM_WIDTH + layout.loc.w;
+    loc.h = max(ITEM_HEIGHT, layout.loc.h);
 }
 
 void Operator::draw(SDL_Renderer* rend){
@@ -72,8 +68,15 @@ void Operator::draw(SDL_Renderer* rend){
     r.y = loc.y;
     r.w = ITEM_WIDTH;
     r.h = ITEM_HEIGHT;
-    SDL_RenderCopy(rend, img.get(), NULL, &r);
-    if(module){ module->draw(rend); }
+
+    if(module){
+        SDL_RenderCopy(rend, module->img.get(), NULL, &r);
+        r.w = ITEM_WIDTH/3;
+        r.h = ITEM_HEIGHT/3;
+        SDL_RenderCopy(rend, img.get(), NULL, &r); // operator on top of module
+    } else {
+        SDL_RenderCopy(rend, img.get(), NULL, &r);
+    }
     layout.draw(rend);
 
     if(draggedOver){

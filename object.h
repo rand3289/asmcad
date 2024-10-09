@@ -11,8 +11,8 @@
 struct Object: public std::enable_shared_from_this<Object>{
     bool isClone = false;
     bool draggedOver = false;
-    SDL_Rect loc; // location of the image
-    std::shared_ptr<SDL_Texture> img;
+    SDL_Rect loc; // location and dimentions of the Object
+    std::shared_ptr<SDL_Texture> img; // Object's background image
     Object();
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects

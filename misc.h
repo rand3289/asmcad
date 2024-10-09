@@ -14,7 +14,7 @@ class ImageLoader {
     static SDL_Renderer* renderer;
 public:
     static void setRenderer(SDL_Renderer* rendereR){ renderer = rendereR; }
-    static SDL_Texture* getImage(const std::string& filename);
+    static std::shared_ptr<SDL_Texture> getImage(const std::string& filename);
 };
 
 

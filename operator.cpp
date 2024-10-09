@@ -72,7 +72,7 @@ void Operator::draw(SDL_Renderer* rend){
     r.y = loc.y;
     r.w = ITEM_WIDTH;
     r.h = ITEM_HEIGHT;
-    SDL_RenderCopy(rend, img, NULL, &r);
+    SDL_RenderCopy(rend, img.get(), NULL, &r);
     if(module){ module->draw(rend); }
     layout.draw(rend);
 

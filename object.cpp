@@ -21,7 +21,7 @@ void Object::setLocation(const Point& xy){
 }
 
 void Object::draw(SDL_Renderer* rend){
-    SDL_RenderCopy(rend, img, NULL, &loc);
+    SDL_RenderCopy(rend, img.get(), NULL, &loc);
     if(draggedOver){
         SDL_SetRenderDrawColor(rend,255,0,0,255);
     } else {

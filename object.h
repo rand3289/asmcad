@@ -12,15 +12,14 @@ struct Object: public std::enable_shared_from_this<Object>{
     bool isClone = false;
     bool draggedOver = false;
     SDL_Rect loc; // location of the image
-    SDL_Texture* img; // this is an opaque pointer and can not be wrapped in shared_ptr. Own it
+    std::shared_ptr<SDL_Texture> img;
     Object();
-    virtual ~Object(){ if(img){ SDL_DestroyTexture(img); } }
 
     // The way children are removed is by dragging them out but sometimes they also have to be deleted from other objects
     virtual bool removeChild(std::shared_ptr<Object>& obj){ return false; };
     virtual bool saveScad(std::ostream& file)=0; // save self and children into an openscad file
     virtual void setLocation(const Point& xy);
-    virtual void setImage(SDL_Texture* sdlTexture){ img = sdlTexture; }
+    virtual void setImage(std::shared_ptr<SDL_Texture> sdlTexture){ img = sdlTexture; }
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
 

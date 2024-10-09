@@ -125,7 +125,7 @@ public:
 class Modifier: public Object {
     Input x,y,z;
 public:
-    enum ModifierType {TRANSLATE, ROTATE} type;
+    enum ModifierType {TRANSLATE, ROTATE, SCALE} type;
     Modifier(ModifierType mt);
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);

@@ -51,12 +51,21 @@ void Input::draw(SDL_Renderer* rend){
 
 
 Modifier::Modifier(ModifierType mt): type(mt) {
-    const string imgFileName = ROTATE == type ? "img/rotate.png" : "img/translate.png";
-    img = ImageLoader::getImage(imgFileName);
+    string fName;
+    switch(type){
+        case ROTATE:    fName = "img/rotate.png";    break;
+        case TRANSLATE: fName = "img/translate.png"; break;
+        case SCALE:     fName = "img/scale.png";     break;
+    }
+    img = ImageLoader::getImage(fName);
 }
 
 bool Modifier::saveScad(ostream& file){
-    file << (ROTATE==type ? "rotate" : "translate");
+    switch(type){
+        case ROTATE:    file << "rotate";    break;
+        case TRANSLATE: file << "translate"; break;
+        case SCALE:     file << "scale";     break;
+    }
     file << "([";
     x.saveScad(file);
     file << ",";
@@ -109,10 +118,12 @@ bool Shape::saveScad(ostream& file){
             c.saveScad(file);
             file << "],center=true);" << endl; 
             break;
-        case CYLINDER: file << "cylinder(d=";
+        case CYLINDER: file << "cylinder(h=";
             a.saveScad(file);
-            file << ",h=";
+            file << ",d=";
             b.saveScad(file);
+            file << ",d2=";
+            c.saveScad(file);
             file << ",center=true);" << endl;
             break;
         case SPHERE: file << "sphere(d=";

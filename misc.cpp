@@ -68,6 +68,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto sphere       = make_shared<Shape>(Shape::SPHERE);
     auto translate    = make_shared<Modifier>(Modifier::TRANSLATE);
     auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
+    auto scale        = make_shared<Modifier>(Modifier::SCALE);
     auto custom       = make_shared<Custom>();
     auto dzDelete     = make_shared<DropZone>(DropZone::DELETE); // TODO: pass labels and main in constructor
 
@@ -85,6 +86,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     menu->addObject(sphere);
     menu->addObject(translate);
     menu->addObject(rotate);
+    menu->addObject(scale);
     menu->addObject(custom);
     menu->addObject(dzDelete);
 

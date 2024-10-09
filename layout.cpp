@@ -94,6 +94,7 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
         }
     }
     if(disableDragDrop){ return false; }
+    if( end(children) != find(begin(children), end(children), obj)) { return true; } // duplicates
     addObject(obj);
     setLocation(Point(loc.x,loc.y)); // perform layout
     cout << "Added an object. children size=" << children.size() << endl;
@@ -127,7 +128,7 @@ bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
         return false; 
     }
     auto module = op->getModule();
-    // TODO: check if it is already in the list
+    if( end(children) != find(begin(children), end(children), module)) { return true; } // duplicate
     addObject(module);
     setLocation(Point(loc.x, loc.y));
     cout << "Added a label to Labels at "<< loc.x << "," << loc.y << endl;
@@ -147,6 +148,7 @@ bool Main::dropped(const Point& xy, shared_ptr<Object>const & obj){
         cout << "Object is not an operator." << endl;
         return false;
     }
+    if( end(children) != find(begin(children), end(children), obj)) { return true; } // duplicate
     addObject(obj);
     setLocation(Point(loc.x, loc.y));
     cout << "Added an Operator to Main." << endl;

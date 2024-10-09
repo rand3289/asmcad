@@ -42,7 +42,7 @@ bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     if(!isClone){ return false; } // originals can only be dragged
     cout << "Adding an object to an operator." << endl;
     layout.addObject(obj);
-    layout.loc.w += ITEM_WIDTH; // TODO: this is wrong
+    layout.loc.w += ITEM_WIDTH; // TODO: this is wrong (for 2 reasons!!!)
     layout.setLocation(Point(loc.x+ITEM_WIDTH*(module?2:1), loc.y));
     return true;
 }

@@ -31,7 +31,7 @@ struct Point {
         y = rhs.y;
         return *this;
     }
-//    bool inRectangle(const Point ul, const Point lr);
-    bool inRectangle(const SDL_Rect& loc) const { return loc.x<=x && loc.y<=y && x<=loc.x+loc.w && y<=loc.y+loc.h; }
-    Point operator+(const Point& rhs){ return Point(x+rhs.x,y+rhs.y); }
+    bool inRectangle(const SDL_Rect& loc) const {
+        return loc.x<=x && loc.y<=y && x<=loc.x+loc.w && y<=loc.y+loc.h;
+    }
 };

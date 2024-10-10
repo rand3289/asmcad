@@ -94,10 +94,11 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
         }
     }
     if(disableDragDrop){ return false; }
-    if( end(children) != find(begin(children), end(children), obj)) { return true; } // duplicates
-    addObject(obj);
+    if( end(children) == find(begin(children), end(children), obj)) {
+        addObject(obj);
+        cout << "Added an object. children size=" << children.size() << endl;
+    }
     setLocation(Point(loc.x,loc.y)); // perform layout
-    cout << "Added an object. children size=" << children.size() << endl;
     return true;
 }
 
@@ -124,14 +125,16 @@ void VerticalLayout::setLocation(const Point& xy){
 bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
     auto op = dynamic_pointer_cast<Operator>(obj);
     if(!op || !op->isClone){
+        setLocation(Point(loc.x, loc.y));
         cout << "Object is not an operator." << endl;
         return false; 
     }
     auto module = op->getModule();
-    if( end(children) != find(begin(children), end(children), module)) { return true; } // duplicate
-    addObject(module);
+    if( end(children) == find(begin(children), end(children), module)) {
+        addObject(module);
+        cout << "Added a label to Labels at "<< loc.x << "," << loc.y << endl;
+    }
     setLocation(Point(loc.x, loc.y));
-    cout << "Added a label to Labels at "<< loc.x << "," << loc.y << endl;
     return true;
 }
 
@@ -148,9 +151,10 @@ bool Main::dropped(const Point& xy, shared_ptr<Object>const & obj){
         cout << "Object is not an operator." << endl;
         return false;
     }
-    if( end(children) != find(begin(children), end(children), obj)) { return true; } // duplicate
-    addObject(obj);
+    if( end(children) == find(begin(children), end(children), obj)) {
+        addObject(obj);
+        cout << "Added an Operator to Main." << endl;
+    }
     setLocation(Point(loc.x, loc.y));
-    cout << "Added an Operator to Main." << endl;
     return true;
 }

@@ -8,6 +8,7 @@ using namespace std;
 
 void exitSDLerr(){
     std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+    IMG_Quit();
     SDL_Quit();
     exit(1);
 }

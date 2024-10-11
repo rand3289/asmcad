@@ -114,8 +114,10 @@ public:
 class Input: public Object {  // does not have children
     double value;
     double delta;
+    bool enabled;
 public:
-    Input(): value(0), delta(1.0) { loc.w = 80; loc.h = 16; }
+    Input(): value(0), delta(1.0), enabled(true) { loc.w = 80; loc.h = 16; }
+    void disable(){ enabled = false; }
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> click(const Point& xy);
     virtual std::shared_ptr<Object> clickr(const Point& xy); // change it slowly after right click
@@ -123,7 +125,7 @@ public:
     virtual bool saveScad(std::ostream& file);
 };
 
-
+// an object with 3 input fields
 class XYZ: public Object{
 protected:
     std::shared_ptr<Input> x,y,z;

@@ -47,6 +47,7 @@ bool Input::saveScad(ostream& file){
 }
 
 void Input::draw(SDL_Renderer* rend){
+    if(!enabled){ return; }
     SDL_SetRenderDrawColor(rend, 255, 128, 128, SDL_ALPHA_OPAQUE);
     SDL_RenderDrawRect(rend, &loc);
     // TODO: draw value
@@ -105,7 +106,10 @@ Shape::Shape(ShapeType st): type(st) {
     switch(type){
         case CUBE: imgFileName = "img/cube.png"; break;
         case CYLINDER: imgFileName = "img/cylinder.png"; break;
-        case SPHERE: imgFileName = "img/sphere.png"; break;
+        case SPHERE: imgFileName = "img/sphere.png"; 
+            x->disable(); // sphere has only one variable
+            y->disable();
+            break;
     }
     img = ImageLoader::getImage(imgFileName); 
 }

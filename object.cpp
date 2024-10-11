@@ -23,9 +23,9 @@ void Object::setLocation(const Point& xy){
 void Object::draw(SDL_Renderer* rend){
     SDL_RenderCopy(rend, img.get(), NULL, &loc);
     if(draggedOver){
-        SDL_SetRenderDrawColor(rend,255,0,0,255);
+        SDL_SetRenderDrawColor(rend, 255, 0, 0, SDL_ALPHA_OPAQUE);
     } else {
-        SDL_SetRenderDrawColor(rend,255,255,255,255);
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
     }
     SDL_RenderDrawRect(rend, &loc);
 }
@@ -47,9 +47,21 @@ bool Input::saveScad(ostream& file){
 }
 
 void Input::draw(SDL_Renderer* rend){
-    SDL_SetRenderDrawColor(rend,255,255,255,255);
+    SDL_SetRenderDrawColor(rend, 255, 128, 128, SDL_ALPHA_OPAQUE);
     SDL_RenderDrawRect(rend, &loc);
     // TODO: draw value
+}
+
+std::shared_ptr<Object> Input::click(const Point& xy){
+    std::cout << '<'; std::cout.flush();
+    delta = 1.0;
+    return shared_from_this();
+}
+
+std::shared_ptr<Object> Input::clickr(const Point& xy){ // change it slowly after right click
+    std::cout << '>'; std::cout.flush();
+    delta = 0.01;
+    return shared_from_this();
 }
 
 
@@ -81,8 +93,6 @@ bool Modifier::saveScad(ostream& file){
 
 void Modifier::setLocation(const Point& xy){
     Object::setLocation(xy);
-    int dx = loc.w - x.loc.w;
-    Point delta(dx/2,loc.h-4*x.loc.y);
     x.setLocation(Point(xy.x+10,xy.y+90));
     y.setLocation(Point(xy.x+10,xy.y+110));
     z.setLocation(Point(xy.x+10,xy.y+130));
@@ -112,26 +122,33 @@ Shape::Shape(ShapeType st): type(st) {
     img = ImageLoader::getImage(imgFileName); 
 }
 
+void Shape::setLocation(const Point& xy){
+    Object::setLocation(xy);
+    x.setLocation(Point(xy.x+10,xy.y+90));
+    y.setLocation(Point(xy.x+10,xy.y+110));
+    z.setLocation(Point(xy.x+10,xy.y+130));
+}
+
 bool Shape::saveScad(ostream& file){
     switch(type){
         case CUBE: file << "cube([";
-            a.saveScad(file);
+            x.saveScad(file);
             file << ",";
-            b.saveScad(file);
+            y.saveScad(file);
             file << ",";
-            c.saveScad(file);
+            z.saveScad(file);
             file << "],center=true);" << endl; 
             break;
         case CYLINDER: file << "cylinder(h=";
-            a.saveScad(file);
+            x.saveScad(file);
             file << ",d=";
-            b.saveScad(file);
+            y.saveScad(file);
             file << ",d2=";
-            c.saveScad(file);
+            z.saveScad(file);
             file << ",center=true);" << endl;
             break;
         case SPHERE: file << "sphere(d=";
-            a.saveScad(file);
+            x.saveScad(file);
             file << ");" << endl;
             break;
         default: break;
@@ -141,9 +158,9 @@ bool Shape::saveScad(ostream& file){
 
 void Shape::draw(SDL_Renderer* rend){
     Object::draw(rend);
-    a.draw(rend);
-    b.draw(rend);
-    c.draw(rend);
+    x.draw(rend);
+    y.draw(rend);
+    z.draw(rend);
 }
 
 std::shared_ptr<Object> Shape::clone(){

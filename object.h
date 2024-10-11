@@ -23,8 +23,8 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
 
-    virtual std::shared_ptr<Object> click (const Point& xy){ return shared_from_this(); } // mouse click
-    virtual std::shared_ptr<Object> clickr(const Point& xy){ return shared_from_this(); } // right click
+    virtual std::shared_ptr<Object> click (const Point& xy){ return std::shared_ptr<Object>(); } // mouse click
+    virtual std::shared_ptr<Object> clickr(const Point& xy){ return std::shared_ptr<Object>(); } // right click
     virtual void scroll(const Point& xy, int y){} // mouse wheel scrolls in vertical direction
 
     // mouse started dragging within this object
@@ -63,13 +63,12 @@ public:
 // scrolls on up()/down() events
 // It can contain FlowLayout, Operator and Module
 // when window is resized, it resizes in width and height
+// TODO:    void setSize(int H, int W){ loc.h = H; loc.w = W; }
 struct VerticalLayout: public FlowLayout {
     VerticalLayout(int width, int height, bool disDragDrop=false): FlowLayout(width, disDragDrop){ loc.h = height; }
     virtual void setLocation(const Point& xy);
     virtual void scroll(const Point& xy, int y);
-//    void setSize(int H, int W){ loc.h = H; loc.w = W; }
 };
-
 
 struct Labels: public VerticalLayout {
     Labels(int width, int height): VerticalLayout(width, height){}
@@ -118,18 +117,19 @@ class Input: public Object {  // does not have children
 public:
     Input(): value(0), delta(1.0) { loc.w = 80; loc.h = 16; }
     virtual void draw(SDL_Renderer* rend);
-    virtual std::shared_ptr<Object> click(const Point& xy){
-        std::cout << '<'; std::cout.flush();
-        delta = 1.0;
-        return shared_from_this();
-    }
-    virtual std::shared_ptr<Object> clickr(const Point& xy){ // change it slowly after right click
-        std::cout << '>'; std::cout.flush();
-        delta = 0.01;
-        return shared_from_this();
-    }
+    virtual std::shared_ptr<Object> click(const Point& xy);
+    virtual std::shared_ptr<Object> clickr(const Point& xy); // change it slowly after right click
     virtual void scroll(const Point& xy, int y){ value += y*delta; std::cout << 's'; std::cout.flush(); }
     virtual bool saveScad(std::ostream& file);
+};
+
+
+class XYZ: public Object{
+protected:
+    Input x,y,z;
+public:
+    virtual void draw(SDL_Renderer* rend);
+    virtual void setLocation(const Point& xy);
 };
 
 // translate/rotate
@@ -158,15 +158,15 @@ public:
     }
     virtual bool saveScad(std::ostream& file){ return true; }
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy){ return std::shared_ptr<Object>(); }
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
 class Shape: public Object { // does not have children
-    Input a,b,c;
+    Input x,y,z;
 public:
     enum ShapeType {CUBE, CYLINDER, SPHERE} type;
     Shape(ShapeType st);
+    virtual void setLocation(const Point& xy);
     virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();

@@ -109,7 +109,8 @@ std::shared_ptr<Object> FlowLayout::click(const Point& xy){
             if(o){ return o; }
         }
     }
-    // Flow Layout should not be in focus because it does not respond to mouse wheel events
+    // Flow Layout should never be in focus because it does not respond to mouse wheel events
+    // TODO for vertical layout !!!
     return shared_ptr<Object>();
 }
 

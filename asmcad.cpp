@@ -69,7 +69,7 @@ int main(int argc, char* argv[]){
                     break;
                 case SDL_MOUSEWHEEL:
                     if(!inFocus){ break; }
-                    root->scroll(xy, e.wheel.y);
+                    inFocus->scroll(xy, e.wheel.y);
                     break;
                 default: break;
             } // switch

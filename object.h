@@ -105,7 +105,7 @@ public:
     virtual void setLocation(const Point& xy);
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> click (const Point& xy){ return layout.click(xy); }
-    virtual std::shared_ptr<Object> clickr(const Point& xy){ return layout.click(xy); }
+    virtual std::shared_ptr<Object> clickr(const Point& xy){ return layout.clickr(xy); }
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -126,8 +126,9 @@ public:
 
 class XYZ: public Object{
 protected:
-    Input x,y,z;
+    std::shared_ptr<Input> x,y,z;
 public:
+    XYZ();
     virtual void draw(SDL_Renderer* rend);
     virtual void setLocation(const Point& xy);
     virtual std::shared_ptr<Object> click(const Point& xy);

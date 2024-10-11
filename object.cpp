@@ -84,11 +84,11 @@ bool Modifier::saveScad(ostream& file){
         case SCALE:     file << "scale";     break;
     }
     file << "([";
-    x.saveScad(file);
+    x->saveScad(file);
     file << ",";
-    y.saveScad(file);
+    y->saveScad(file);
     file << ",";
-    z.saveScad(file);
+    z->saveScad(file);
     file << "]) ";
     return true;
 }
@@ -113,23 +113,23 @@ Shape::Shape(ShapeType st): type(st) {
 bool Shape::saveScad(ostream& file){
     switch(type){
         case CUBE: file << "cube([";
-            x.saveScad(file);
+            x->saveScad(file);
             file << ",";
-            y.saveScad(file);
+            y->saveScad(file);
             file << ",";
-            z.saveScad(file);
+            z->saveScad(file);
             file << "],center=true);" << endl; 
             break;
         case CYLINDER: file << "cylinder(h=";
-            x.saveScad(file);
+            x->saveScad(file);
             file << ",d=";
-            y.saveScad(file);
+            y->saveScad(file);
             file << ",d2=";
-            z.saveScad(file);
+            z->saveScad(file);
             file << ",center=true);" << endl;
             break;
         case SPHERE: file << "sphere(d=";
-            x.saveScad(file);
+            z->saveScad(file);
             file << ");" << endl;
             break;
         default: break;
@@ -144,38 +144,42 @@ std::shared_ptr<Object> Shape::clone(){
 }
 
 
+XYZ::XYZ(){
+    x = make_shared<Input>();
+    y = make_shared<Input>();
+    z = make_shared<Input>();
+}
+
 void XYZ::draw(SDL_Renderer* rend){
     Object::draw(rend);
-    x.draw(rend);
-    y.draw(rend);
-    z.draw(rend);
+    x->draw(rend);
+    y->draw(rend);
+    z->draw(rend);
 }
 
 void XYZ::setLocation(const Point& xy){
     Object::setLocation(xy);
-    x.setLocation(Point(xy.x+10,xy.y+90));
-    y.setLocation(Point(xy.x+10,xy.y+110));
-    z.setLocation(Point(xy.x+10,xy.y+130));
+    x->setLocation(Point(xy.x+10,xy.y+90));
+    y->setLocation(Point(xy.x+10,xy.y+110));
+    z->setLocation(Point(xy.x+10,xy.y+130));
 }
 
 std::shared_ptr<Object> XYZ::click(const Point& xy){
-    cout << "xyz_click()" << endl;
-    auto o = x.click(xy);
+    auto o = x->click(xy);
     if(o){ return o; }
-    o = y.click(xy);
+    o = y->click(xy);
     if(o){ return o; }
-    o = z.click(xy);
+    o = z->click(xy);
     if(o){ return o; }
     return shared_ptr<Object>();
 }
 
 std::shared_ptr<Object> XYZ::clickr(const Point& xy){
-    cout << "xyz_clickr()" << endl;
-    auto o = x.clickr(xy);
+    auto o = x->clickr(xy);
     if(o){ return o; }
-    o = y.clickr(xy);
+    o = y->clickr(xy);
     if(o){ return o; }
-    o = z.clickr(xy);
+    o = z->clickr(xy);
     if(o){ return o; }
     return shared_ptr<Object>();
 }

@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
 
     shared_ptr<Object> root = initGui(SCREEN_WIDTH, SCREEN_HEIGHT);
     shared_ptr<Object> draggedObject; // if not null, mouse is dragging this object
+    shared_ptr<Object> inFocus; // when an object is clicked on, it becomes in focus and receives mouse wheel events
     Point xy;
     bool buttonDown = false;
     Uint32 state = 0;
@@ -52,9 +53,9 @@ int main(int argc, char* argv[]){
                         root->dropped(xy, draggedObject);
                         draggedObject.reset();
                     } else if(state & SDL_BUTTON(SDL_BUTTON_LEFT)){
-                        root->click(xy);
+                        inFocus = root->click(xy);
                     } else if(state & SDL_BUTTON(SDL_BUTTON_RIGHT)){
-                        root->clickr(xy);
+                        inFocus = root->clickr(xy);
                     }
                     break;
                 case SDL_MOUSEMOTION:
@@ -69,6 +70,7 @@ int main(int argc, char* argv[]){
                     root->drag(xy);
                     break;
                 case SDL_MOUSEWHEEL:
+                    if(!inFocus){ break; }
                     SDL_GetMouseState(&xy.x, &xy.y);
                     root->scroll(xy, e.wheel.y);
                     break;

@@ -46,7 +46,28 @@ bool Input::saveScad(ostream& file){
     return true;
 }
 void Input::draw(SDL_Renderer* rend){
-    // TODO: draw 'value' on screen
+    SDL_SetRenderDrawColor(rend,255,255,255,255);
+    SDL_RenderDrawRect(rend, &loc);
+}
+
+std::shared_ptr<Object> FlowLayout::click(const Point& xy){
+    for(auto& c: children){
+        if(xy.inRectangle(c->loc)){
+            auto o = c->click(xy);
+            if(o){ return o; }
+        }
+    }
+    return shared_from_this();
+}
+
+std::shared_ptr<Object> FlowLayout::clickr(const Point& xy){
+    for(auto& c: children){
+        if(xy.inRectangle(c->loc)){
+            auto o = c->clickr(xy);
+            if(o){ return o; }
+        }
+    }
+    return shared_from_this();
 }
 
 
@@ -80,10 +101,9 @@ void Modifier::setLocation(const Point& xy){
     Object::setLocation(xy);
     int dx = loc.w - x.loc.w;
     Point delta(dx/2,loc.h-4*x.loc.y);
-// TODO:
-//    x.setLocation(xy+delta);
-//    y.setLocation();
-//    z.setLocation();
+    x.setLocation(Point(xy.x+10,xy.y+90));
+    y.setLocation(Point(xy.x+10,xy.y+110));
+    z.setLocation(Point(xy.x+10,xy.y+130));
 }
 
 void Modifier::draw(SDL_Renderer* rend){

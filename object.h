@@ -23,8 +23,8 @@ struct Object: public std::enable_shared_from_this<Object>{
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> clone(){ return shared_from_this(); }; // by default just return self
 
-    virtual void click (const Point& xy){} // mouse click
-    virtual void clickr(const Point& xy){} // right click
+    virtual std::shared_ptr<Object> click (const Point& xy){ return shared_from_this(); } // mouse click
+    virtual std::shared_ptr<Object> clickr(const Point& xy){ return shared_from_this(); } // right click
     virtual void scroll(const Point& xy, int y){} // mouse wheel scrolls in vertical direction
 
     // mouse started dragging within this object
@@ -52,8 +52,10 @@ public:
     virtual void setLocation(const Point& xy);
     virtual bool removeChild(std::shared_ptr<Object>& obj);
     virtual void draw(SDL_Renderer* rend);
-    virtual std::shared_ptr<Object> takeObject(const Point& xy);
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    virtual std::shared_ptr<Object> takeObject(const Point& xy);
+    virtual std::shared_ptr<Object> click (const Point& xy);
+    virtual std::shared_ptr<Object> clickr(const Point& xy);
 };
 
 // Vertical Layout will be used in the main frame as "lines" to contain Operator and in the MODULE list
@@ -97,12 +99,14 @@ class Operator: public Object {
 public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
     Operator(OperatorType ot);
+    std::shared_ptr<Object> getModule();
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
     virtual void setLocation(const Point& xy);
     virtual void draw(SDL_Renderer* rend);
-    std::shared_ptr<Object> getModule();
+    virtual std::shared_ptr<Object> click (const Point& xy){ return layout.click(xy); }
+    virtual std::shared_ptr<Object> clickr(const Point& xy){ return layout.click(xy); }
 };
 
 // Floating point numeric input box from which Shape and translate/rotate take their parameters
@@ -112,10 +116,17 @@ class Input: public Object {  // does not have children
     double value;
     double delta;
 public:
-    Input(): value(10), delta(1.0) {}
+    Input(): value(0), delta(1.0) { loc.w = 80; loc.h = 16; }
     virtual void draw(SDL_Renderer* rend);
-    virtual void click(const Point& xy){ delta = 1.0; }
-    virtual void clickr(const Point& xy){ delta = 0.01; } // change it slowly after right click
+    virtual std::shared_ptr<Object> click(const Point& xy){
+        delta = 1.0;
+        return shared_from_this();
+    }
+    virtual std::shared_ptr<Object> clickr(const Point& xy){ // change it slowly after right click
+        delta = 0.01;
+        return shared_from_this();
+    }
+    virtual void scroll(const Point& xy, int y){ value += y*delta; std::cout << 's'; std::cout.flush(); }
     virtual bool saveScad(std::ostream& file);
 };
 

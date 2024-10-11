@@ -45,29 +45,11 @@ bool Input::saveScad(ostream& file){
     file << value;
     return true;
 }
+
 void Input::draw(SDL_Renderer* rend){
     SDL_SetRenderDrawColor(rend,255,255,255,255);
     SDL_RenderDrawRect(rend, &loc);
-}
-
-std::shared_ptr<Object> FlowLayout::click(const Point& xy){
-    for(auto& c: children){
-        if(xy.inRectangle(c->loc)){
-            auto o = c->click(xy);
-            if(o){ return o; }
-        }
-    }
-    return shared_from_this();
-}
-
-std::shared_ptr<Object> FlowLayout::clickr(const Point& xy){
-    for(auto& c: children){
-        if(xy.inRectangle(c->loc)){
-            auto o = c->clickr(xy);
-            if(o){ return o; }
-        }
-    }
-    return shared_from_this();
+    // TODO: draw value
 }
 
 
@@ -108,7 +90,9 @@ void Modifier::setLocation(const Point& xy){
 
 void Modifier::draw(SDL_Renderer* rend){
     Object::draw(rend);
-    // TODO: draw inputs x,y,z
+    x.draw(rend);
+    y.draw(rend);
+    z.draw(rend);
 }
 
 std::shared_ptr<Object> Modifier::clone(){
@@ -157,8 +141,11 @@ bool Shape::saveScad(ostream& file){
 
 void Shape::draw(SDL_Renderer* rend){
     Object::draw(rend);
-    // TODO: draw inputs a,b,c
+    a.draw(rend);
+    b.draw(rend);
+    c.draw(rend);
 }
+
 std::shared_ptr<Object> Shape::clone(){
     auto obj = std::make_shared<Shape>(type);
     obj->isClone = true;

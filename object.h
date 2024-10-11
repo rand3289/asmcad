@@ -119,10 +119,12 @@ public:
     Input(): value(0), delta(1.0) { loc.w = 80; loc.h = 16; }
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> click(const Point& xy){
+        std::cout << '<'; std::cout.flush();
         delta = 1.0;
         return shared_from_this();
     }
     virtual std::shared_ptr<Object> clickr(const Point& xy){ // change it slowly after right click
+        std::cout << '>'; std::cout.flush();
         delta = 0.01;
         return shared_from_this();
     }

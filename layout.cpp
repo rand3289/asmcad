@@ -102,9 +102,29 @@ bool FlowLayout::dropped(const Point& xy, shared_ptr<Object>const & obj){
     return true;
 }
 
+std::shared_ptr<Object> FlowLayout::click(const Point& xy){
+    for(auto& c: children){
+        if(xy.inRectangle(c->loc)){
+            auto o = c->click(xy);
+            if(o){ return o; }
+        }
+    }
+    // Flow Layout should not be in focus because it does not respond to mouse wheel events
+    return shared_ptr<Object>();
+}
+
+std::shared_ptr<Object> FlowLayout::clickr(const Point& xy){
+    for(auto& c: children){
+        if(xy.inRectangle(c->loc)){
+            auto o = c->clickr(xy);
+            if(o){ return o; }
+        }
+    }
+    return shared_ptr<Object>();
+}
+
 
 /*************************************************************************/
-
 void VerticalLayout::scroll(const Point& xy, int y){
     cout << y << " ";
     cout.flush();

@@ -46,11 +46,16 @@ bool Input::saveScad(ostream& file){
     return true;
 }
 
+std::shared_ptr<Text> Input::printer;
+
 void Input::draw(SDL_Renderer* rend){
     if(!enabled){ return; }
-    SDL_SetRenderDrawColor(rend, 255, 128, 128, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawRect(rend, &loc);
-    // TODO: draw value
+    SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_RenderFillRect(rend, &loc);
+    SDL_SetRenderDrawColor(rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    char buff[64];
+    sprintf(buff,"%.2f", value);
+    printer->print(string(buff), loc.x, loc.y, rend); // TODO: fix that string conversion
 }
 
 std::shared_ptr<Object> Input::click(const Point& xy){

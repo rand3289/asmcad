@@ -1,7 +1,7 @@
 # -Werror -ansi -pedantic -Wall -Wextra -Wno-unused-parameter
 CC = g++  # notice CFLAGS contains -g which will compile everything in debug mode!
 CFLAGS = -g --std=c++11 -Wall -Wextra -Wno-unused-parameter
-DEPS = object.h misc.h
+DEPS = object.h misc.h sdltext.h
 OBJ = asmcad.o object.o layout.o operator.o misc.o
 
 ifdef OS # windows defines this environment variable

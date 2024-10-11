@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "misc.h"
+#include "sdltext.h"
 
 #define ITEM_HEIGHT 150
 #define ITEM_WIDTH 100
@@ -115,8 +116,15 @@ class Input: public Object {  // does not have children
     double value;
     double delta;
     bool enabled;
+    static std::shared_ptr<Text> printer; // writes text to screen
 public:
-    Input(): value(0), delta(1.0), enabled(true) { loc.w = 80; loc.h = 16; }
+    Input(): value(0), delta(1.0), enabled(true) {
+        loc.w = 80;
+        loc.h = 16;
+        if(!printer){ // TODO: make printer non-pointer???
+            printer = std::make_shared<Text>();
+        }
+    }
     void disable(){ enabled = false; }
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> click(const Point& xy);

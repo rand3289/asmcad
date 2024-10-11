@@ -130,29 +130,22 @@ protected:
 public:
     virtual void draw(SDL_Renderer* rend);
     virtual void setLocation(const Point& xy);
+    virtual std::shared_ptr<Object> click(const Point& xy);
+    virtual std::shared_ptr<Object> clickr(const Point& xy);
 };
 
-// translate/rotate
-// can "contain" Shape, Module and another Modifier
-class Modifier: public Object {
-    Input x,y,z;
-public:
+// translate/rotate/scale
+struct Modifier: public XYZ {
     enum ModifierType {TRANSLATE, ROTATE, SCALE} type;
     Modifier(ModifierType mt);
-    virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
-    virtual void setLocation(const Point& xy);
     virtual std::shared_ptr<Object> clone();
 };
 
 // An actual shape such as OpenScad's cube, cylinder and sphere
-class Shape: public Object { // does not have children
-    Input x,y,z;
-public:
+struct Shape: public XYZ {
     enum ShapeType {CUBE, CYLINDER, SPHERE} type;
     Shape(ShapeType st);
-    virtual void setLocation(const Point& xy);
-    virtual void draw(SDL_Renderer* rend);
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();
 };

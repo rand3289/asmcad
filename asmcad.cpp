@@ -33,12 +33,12 @@ int main(int argc, char* argv[]){
     shared_ptr<Object> inFocus; // when an object is clicked on, it becomes in focus and receives mouse wheel events
     Point xy;
     bool buttonDown = false;
-    Uint32 state = 0;
     SDL_Event e;
     bool run = true;
 
     while(run){
         while( SDL_PollEvent( &e ) ){
+            SDL_GetMouseState(&xy.x, &xy.y);
             switch(e.type){
                 case SDL_QUIT:
                     run = false;
@@ -48,19 +48,17 @@ int main(int argc, char* argv[]){
                     break;
                 case SDL_MOUSEBUTTONUP:
                     buttonDown = false;
-                    state = SDL_GetMouseState(&xy.x, &xy.y);
                     if(draggedObject){
                         root->dropped(xy, draggedObject);
                         draggedObject.reset();
-                    } else if(state & SDL_BUTTON(SDL_BUTTON_LEFT)){
+                    } else if(e.button.button == SDL_BUTTON_LEFT){
                         inFocus = root->click(xy);
-                    } else if(state & SDL_BUTTON(SDL_BUTTON_RIGHT)){
+                    } else if(e.button.button == SDL_BUTTON_RIGHT){
                         inFocus = root->clickr(xy);
                     }
                     break;
                 case SDL_MOUSEMOTION:
                     if(!buttonDown) { break; }
-                    SDL_GetMouseState(&xy.x, &xy.y);
                     if(!draggedObject){
                         draggedObject = root->takeObject(xy);
                         if(!draggedObject){     // if this object can not be dragged
@@ -71,7 +69,6 @@ int main(int argc, char* argv[]){
                     break;
                 case SDL_MOUSEWHEEL:
                     if(!inFocus){ break; }
-                    SDL_GetMouseState(&xy.x, &xy.y);
                     root->scroll(xy, e.wheel.y);
                     break;
                 default: break;

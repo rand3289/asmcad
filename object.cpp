@@ -53,13 +53,15 @@ void Input::draw(SDL_Renderer* rend){
 }
 
 std::shared_ptr<Object> Input::click(const Point& xy){
-    std::cout << '<'; std::cout.flush();
+    if( !xy.inRectangle(loc) ){ return shared_ptr<Object>(); }
+    std::cout << '<' << endl;
     delta = 1.0;
     return shared_from_this();
 }
 
 std::shared_ptr<Object> Input::clickr(const Point& xy){ // change it slowly after right click
-    std::cout << '>'; std::cout.flush();
+    if( !xy.inRectangle(loc) ){ return shared_ptr<Object>(); }
+    std::cout << '>' << endl;
     delta = 0.01;
     return shared_from_this();
 }
@@ -91,20 +93,6 @@ bool Modifier::saveScad(ostream& file){
     return true;
 }
 
-void Modifier::setLocation(const Point& xy){
-    Object::setLocation(xy);
-    x.setLocation(Point(xy.x+10,xy.y+90));
-    y.setLocation(Point(xy.x+10,xy.y+110));
-    z.setLocation(Point(xy.x+10,xy.y+130));
-}
-
-void Modifier::draw(SDL_Renderer* rend){
-    Object::draw(rend);
-    x.draw(rend);
-    y.draw(rend);
-    z.draw(rend);
-}
-
 std::shared_ptr<Object> Modifier::clone(){
     auto obj = std::make_shared<Modifier>(type);
     obj->isClone = true;
@@ -120,13 +108,6 @@ Shape::Shape(ShapeType st): type(st) {
         case SPHERE: imgFileName = "img/sphere.png"; break;
     }
     img = ImageLoader::getImage(imgFileName); 
-}
-
-void Shape::setLocation(const Point& xy){
-    Object::setLocation(xy);
-    x.setLocation(Point(xy.x+10,xy.y+90));
-    y.setLocation(Point(xy.x+10,xy.y+110));
-    z.setLocation(Point(xy.x+10,xy.y+130));
 }
 
 bool Shape::saveScad(ostream& file){
@@ -156,18 +137,49 @@ bool Shape::saveScad(ostream& file){
     return true;
 }
 
-void Shape::draw(SDL_Renderer* rend){
+std::shared_ptr<Object> Shape::clone(){
+    auto obj = std::make_shared<Shape>(type);
+    obj->isClone = true;
+    return obj;
+}
+
+
+void XYZ::draw(SDL_Renderer* rend){
     Object::draw(rend);
     x.draw(rend);
     y.draw(rend);
     z.draw(rend);
 }
 
-std::shared_ptr<Object> Shape::clone(){
-    auto obj = std::make_shared<Shape>(type);
-    obj->isClone = true;
-    return obj;
+void XYZ::setLocation(const Point& xy){
+    Object::setLocation(xy);
+    x.setLocation(Point(xy.x+10,xy.y+90));
+    y.setLocation(Point(xy.x+10,xy.y+110));
+    z.setLocation(Point(xy.x+10,xy.y+130));
 }
+
+std::shared_ptr<Object> XYZ::click(const Point& xy){
+    cout << "xyz_click()" << endl;
+    auto o = x.click(xy);
+    if(o){ return o; }
+    o = y.click(xy);
+    if(o){ return o; }
+    o = z.click(xy);
+    if(o){ return o; }
+    return shared_ptr<Object>();
+}
+
+std::shared_ptr<Object> XYZ::clickr(const Point& xy){
+    cout << "xyz_clickr()" << endl;
+    auto o = x.clickr(xy);
+    if(o){ return o; }
+    o = y.clickr(xy);
+    if(o){ return o; }
+    o = z.clickr(xy);
+    if(o){ return o; }
+    return shared_ptr<Object>();
+}
+
 
 
 bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){

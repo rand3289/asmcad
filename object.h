@@ -145,6 +145,18 @@ public:
     virtual std::shared_ptr<Object> clone();
 };
 
+// An actual shape such as OpenScad's cube, cylinder and sphere
+class Shape: public Object { // does not have children
+    Input x,y,z;
+public:
+    enum ShapeType {CUBE, CYLINDER, SPHERE} type;
+    Shape(ShapeType st);
+    virtual void setLocation(const Point& xy);
+    virtual void draw(SDL_Renderer* rend);
+    virtual bool saveScad(std::ostream& file);
+    virtual std::shared_ptr<Object> clone();
+};
+
 // These are VIEW and DELETE zones in the upper corners
 // When an Operator is dropped into DELETE, it is deleted if it is unused in the rest of the "code"
 // When a Module is dropped here, module representation (name) is deleted from an Operator and Module list
@@ -158,18 +170,6 @@ public:
     }
     virtual bool saveScad(std::ostream& file){ return true; }
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
-};
-
-// An actual shape such as OpenScad's cube, cylinder and sphere
-class Shape: public Object { // does not have children
-    Input x,y,z;
-public:
-    enum ShapeType {CUBE, CYLINDER, SPHERE} type;
-    Shape(ShapeType st);
-    virtual void setLocation(const Point& xy);
-    virtual void draw(SDL_Renderer* rend);
-    virtual bool saveScad(std::ostream& file);
-    virtual std::shared_ptr<Object> clone();
 };
 
 struct Custom: public Object {

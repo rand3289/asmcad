@@ -122,7 +122,7 @@ public:
         loc.w = 80;
         loc.h = 16;
         if(!printer){ // TODO: make printer non-pointer???
-            printer = std::make_shared<Text>();
+            printer = std::make_shared<Text>(16);
         }
     }
     void disable(){ enabled = false; }

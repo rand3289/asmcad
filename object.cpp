@@ -52,10 +52,10 @@ void Input::draw(SDL_Renderer* rend){
     if(!enabled){ return; }
     SDL_SetRenderDrawColor(rend, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(rend, &loc);
-    SDL_SetRenderDrawColor(rend, 255, 255, 255, SDL_ALPHA_OPAQUE);
     char buff[64];
     sprintf(buff,"%.2f", value);
-    printer->print(string(buff), loc.x, loc.y, rend); // TODO: fix that string conversion
+    static SDL_Color color = { 255, 0, 0, SDL_ALPHA_OPAQUE };
+    printer->print(string(buff), loc.x, loc.y, rend, color); // TODO: fix that string conversion
 }
 
 std::shared_ptr<Object> Input::click(const Point& xy){

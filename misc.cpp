@@ -11,6 +11,7 @@ SDL_Renderer* ImageLoader::renderer;
 
 // load an image as an SDL2 texture
 shared_ptr<SDL_Texture> ImageLoader::getImage(const string& filename){
+    cout << "Loading " << filename << endl;
     SDL_Surface* img = IMG_Load( filename.c_str() );
     // TODO: optimize surface: optimizedSurface = SDL_ConvertSurface( loadedSurface, gScreenSurface->format, 0 );
     if(!renderer){
@@ -18,6 +19,10 @@ shared_ptr<SDL_Texture> ImageLoader::getImage(const string& filename){
         return nullptr;
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, img);
+//    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+//    SDL_SetTextureColorMod(texture, 255, 255, 255);
+//    SDL_SetTextureAlphaMod(texture, 255);
+
     SDL_FreeSurface(img);
     return shared_ptr<SDL_Texture>(texture,&SDL_DestroyTexture);
 }

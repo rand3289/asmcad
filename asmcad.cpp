@@ -79,7 +79,6 @@ int main(int argc, char* argv[]){
         SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
-        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_ADD);
 
         root->draw(renderer);
         if(draggedObject){

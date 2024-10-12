@@ -54,7 +54,7 @@ void Input::draw(SDL_Renderer* rend){
     SDL_RenderFillRect(rend, &loc);
     char buff[64];
     sprintf(buff,"%.2f", value);
-    static SDL_Color color = { 255, 0, 0, SDL_ALPHA_OPAQUE };
+    static SDL_Color color = { 255, 255, 0, SDL_ALPHA_OPAQUE };
     printer->print(string(buff), loc.x, loc.y, rend, color); // TODO: fix that string conversion
 }
 

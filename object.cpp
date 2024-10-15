@@ -35,10 +35,23 @@ void Object::draw(SDL_Renderer* rend){
 bool Module::saveScad(ostream& file){
     auto sp = parent.lock();
     if(sp){
+        if(isClone){ // clones call the module.  Non-clones save the code. TODO: will this work???
+            file << "mod"<< sp.get() << "();";
+            return true;
+        }
         return sp->saveScad(file);
     }
     return false;
 }
+
+std::shared_ptr<Object> Module::clone(){
+    auto sp = parent.lock();
+    if(!sp){ return shared_ptr<Object>(); }
+    auto obj = std::make_shared<Module>(sp);
+    obj->isClone = true;
+    return obj;
+}
+
 
 
 bool Input::saveScad(ostream& file){
@@ -107,6 +120,9 @@ std::shared_ptr<Object> Modifier::clone(){
 
 
 Shape::Shape(ShapeType st): type(st) {
+    x->setValue(10.0);
+    y->setValue(10.0);
+    z->setValue(10.0);
     string imgFileName;
     switch(type){
         case CUBE: imgFileName = "img/cube.png"; break;
@@ -194,7 +210,6 @@ std::shared_ptr<Object> XYZ::clickr(const Point& xy){
 }
 
 
-
 bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     if(VIEW == type){ // if Module or Operator are dropped, generate code
         shared_ptr<Object> mod = dynamic_pointer_cast<Module>(obj);
@@ -205,7 +220,9 @@ bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
         if(mod){
             img = mod->img;
             ofstream file(OUTPUT_FILE_SCAD, ios_base::out);
+// TODO: ALL of the code has to be saved here
             mod->saveScad(file);
+            file << endl << "mod" << op.get() << "()" << endl;
         }
     } else {
         // TODO: remove the object from main view, module view and DropZoneView

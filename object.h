@@ -74,6 +74,7 @@ struct VerticalLayout: public FlowLayout {
 struct Labels: public VerticalLayout {
     Labels(int width, int height): VerticalLayout(width, height){}
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
+    std::shared_ptr<Object> takeObject(const Point& xy);
 };
 
 struct Main: public VerticalLayout {
@@ -86,8 +87,9 @@ struct Main: public VerticalLayout {
 class Module: public Object { // does not have children
     std::weak_ptr<Object> parent;
 public:
-    Module(std::shared_ptr<Object> const & parenT): parent(parenT) { isClone = true; }
+    Module(std::shared_ptr<Object> const & parenT): parent(parenT) { }
     virtual bool saveScad(std::ostream& file);
+    virtual std::shared_ptr<Object> clone();
 };
 
 
@@ -131,6 +133,7 @@ public:
     virtual std::shared_ptr<Object> clickr(const Point& xy); // change it slowly after right click
     virtual void scroll(const Point& xy, int y){ value += y*delta; std::cout << 's'; std::cout.flush(); }
     virtual bool saveScad(std::ostream& file);
+    void setValue(double val){ value = val; }
 };
 
 // an object with 3 input fields

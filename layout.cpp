@@ -34,6 +34,7 @@ bool FlowLayout::saveScad(ostream& file){
 }
 
 void FlowLayout::addObject(shared_ptr<Object>const & obj){
+    if( find(begin(children), end(children), obj) != end(children) ) { return; } // duplicate
     children.push_back(obj);
 }
 
@@ -157,6 +158,18 @@ bool Labels::dropped(const Point& xy, shared_ptr<Object>const & obj){
     }
     setLocation(Point(loc.x, loc.y));
     return true;
+}
+
+
+shared_ptr<Object> Labels::takeObject(const Point& xy){
+    for(auto& c: children){
+        if(xy.inRectangle(c->loc)){
+            auto obj = c;
+            children.erase( remove(begin(children), end(children), c), end(children) );
+            return obj;
+        }
+    }
+    return shared_ptr<Object>();
 }
 
 

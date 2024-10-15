@@ -11,8 +11,8 @@ sudo apt install libsdl2-dev
 ```
 
 ## TODO
+* allow resizing the main window
 * implement loading code from asm.scad
 * implement calling custom modules or adding custom code
 * Add color ???
 * add shear() ???
-

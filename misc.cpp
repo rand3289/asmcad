@@ -39,6 +39,11 @@ bool makeObjectImage(shared_ptr<Object> const & obj){
         cout << "Error saving openscad code to temp file " << TMP_FILE_SCAD << endl;
         return false;
     }
+    auto mod = static_pointer_cast<Module>(obj);
+    if(mod){
+        auto op = mod->getOperator();
+        file << endl << "mod" << op.get() << "();"<< endl;
+    }
     file.close();
 
     // run openscad to produce TMP_FILE_IMG from TMP_FILE_SCAD
@@ -64,7 +69,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto labels = make_shared<Labels>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
     auto main   = make_shared<Main>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
-    auto dzView       = make_shared<DropZone>(DropZone::VIEW);
+    auto dzView       = make_shared<DropZone>(DropZone::VIEW, main);
     auto union_       = make_shared<Operator>(Operator::UNION);
     auto difference   = make_shared<Operator>(Operator::DIFFERENCE);
     auto intersection = make_shared<Operator>(Operator::INTERSECTION);
@@ -75,7 +80,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto rotate       = make_shared<Modifier>(Modifier::ROTATE);
     auto scale        = make_shared<Modifier>(Modifier::SCALE);
     auto custom       = make_shared<Custom>();
-    auto dzDelete     = make_shared<DropZone>(DropZone::DELETE); // TODO: pass labels and main in constructor
+    auto dzDelete     = make_shared<DropZone>(DropZone::DELETE, main);
 
     root  ->addObject(menu);
     root  ->addObject(level2);

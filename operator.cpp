@@ -17,7 +17,7 @@ Operator::Operator(OperatorType ot): layout(0), type(ot){
 
 bool Operator::saveScad(ostream& file){
     if(module){
-        file << "module mod" << module.get() << "(){" << endl;
+        file << "module mod" << this << "(){" << endl;
     }
     switch(type){
         case UNION: file << "union(){" << endl; break;
@@ -27,7 +27,7 @@ bool Operator::saveScad(ostream& file){
     }
     layout.saveScad(file);
     file << "}" << endl; // close operator
-    if(module){ file << "}" << endl << endl << "mod" << module.get() << "();" << endl; }
+    if(module){ file << "}" << endl << endl; }
     return true;
 }
 
@@ -47,7 +47,7 @@ bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     return true;
 }
 
-std::shared_ptr<Object> Operator::getModule(){ // not virtual
+std::shared_ptr<Module> Operator::getModule(){ // not virtual
     if(!module){ module = std::make_shared<Module>(shared_from_this()); }
     if( !makeObjectImage( module ) ){
         std::cout << "ERROR while creating module image." << std::endl;

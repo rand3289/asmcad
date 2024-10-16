@@ -52,6 +52,10 @@ std::shared_ptr<Object> Module::clone(){
     return obj;
 }
 
+shared_ptr<Operator> Module::getOperator(){
+    return dynamic_pointer_cast<Operator>( parent.lock() );
+}
+
 
 
 bool Input::saveScad(ostream& file){
@@ -147,7 +151,7 @@ bool Shape::saveScad(ostream& file){
             break;
         case CYLINDER: file << "cylinder(h=";
             x->saveScad(file);
-            file << ",d=";
+            file << ",d1=";
             y->saveScad(file);
             file << ",d2=";
             z->saveScad(file);
@@ -212,17 +216,20 @@ std::shared_ptr<Object> XYZ::clickr(const Point& xy){
 
 bool DropZone::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     if(VIEW == type){ // if Module or Operator are dropped, generate code
-        shared_ptr<Object> mod = dynamic_pointer_cast<Module>(obj);
-        auto op = dynamic_pointer_cast<Operator>(obj);
+        shared_ptr<Module> mod = dynamic_pointer_cast<Module>(obj);
+        shared_ptr<Operator> op = dynamic_pointer_cast<Operator>(obj);
         if(op){
             mod = op->getModule();
+        } else {
+            op = mod->getOperator();
         }
         if(mod){
             img = mod->img;
-            ofstream file(OUTPUT_FILE_SCAD, ios_base::out);
-// TODO: ALL of the code has to be saved here
-            mod->saveScad(file);
-            file << endl << "mod" << op.get() << "()" << endl;
+        }
+        if(op){
+            ofstream file(OUTPUT_FILE_SCAD, ios_base::out | ios::trunc);
+            root->saveScad(file);
+            file << endl << "mod" << op.get() << "();" << endl;
         }
     } else {
         // TODO: remove the object from main view, module view and DropZoneView

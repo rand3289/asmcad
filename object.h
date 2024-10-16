@@ -82,6 +82,7 @@ struct Main: public VerticalLayout {
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
 };
 
+class Operator;
 // Graphical representation (picture) of an Operator and all its children
 // This is an equivalent of OpenScad's module
 class Module: public Object { // does not have children
@@ -90,18 +91,19 @@ public:
     Module(std::shared_ptr<Object> const & parenT): parent(parenT) { }
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();
+    std::shared_ptr<Operator> getOperator();
 };
 
 
 // When Operator is dropped into the "module list" it should call saveScad() on self, 
 // then generate an image from saved text and then call module->setImage()
 class Operator: public Object {
-    std::shared_ptr<Object> module; // openscad module
+    std::shared_ptr<Module> module; // openscad module
     FlowLayout layout;
 public:
     enum OperatorType {UNION, DIFFERENCE, INTERSECTION} type;
     Operator(OperatorType ot);
-    std::shared_ptr<Object> getModule();
+    std::shared_ptr<Module> getModule();
     virtual bool saveScad(std::ostream& file);
     virtual std::shared_ptr<Object> clone();
     virtual bool dropped(const Point& xy, std::shared_ptr<Object>const & obj);
@@ -131,7 +133,7 @@ public:
     virtual void draw(SDL_Renderer* rend);
     virtual std::shared_ptr<Object> click(const Point& xy);
     virtual std::shared_ptr<Object> clickr(const Point& xy); // change it slowly after right click
-    virtual void scroll(const Point& xy, int y){ value += y*delta; std::cout << 's'; std::cout.flush(); }
+    virtual void scroll(const Point& xy, int y){ value += y*delta; }
     virtual bool saveScad(std::ostream& file);
     void setValue(double val){ value = val; }
 };
@@ -170,9 +172,10 @@ struct Shape: public XYZ {
 // When a module (operator) is dragged into VIEW, it generates and saves OpenScad code into OUTPUT_FILE_SCAD
 // Code in OUTPUT_FILE_SCAD should be opened in OpenScad for real-time display
 class DropZone: public Object { // does not have children
+    std::shared_ptr<Object> root;
 public:
     enum DZType {VIEW, DELETE} type;
-    DropZone(DZType dzt): type(dzt) {
+    DropZone(DZType dzt, std::shared_ptr<Object> rootObj): root(rootObj), type(dzt) {
         img = ImageLoader::getImage( VIEW == type ? "img/view.png" : "img/delete.png");
     }
     virtual bool saveScad(std::ostream& file){ return true; }

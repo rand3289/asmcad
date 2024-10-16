@@ -52,7 +52,7 @@ std::shared_ptr<Module> Operator::getModule(){ // not virtual
     if( !makeObjectImage( module ) ){
         std::cout << "ERROR while creating module image." << std::endl;
     }
-    return module;
+    return static_pointer_cast<Module>(module->clone());
 }
 
 void Operator::setLocation(const Point& xy){

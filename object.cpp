@@ -8,7 +8,7 @@ using namespace std;
 const string OUTPUT_FILE_SCAD = "asm.scad";
 
 
-Object::Object(): img(nullptr) {
+Object::Object() {
     loc.x=0;
     loc.y=0;
     loc.w = ITEM_WIDTH;
@@ -34,20 +34,19 @@ void Object::draw(SDL_Renderer* rend){
 // Module does not have any openscad code.  It's parent Operator has the code.
 bool Module::saveScad(ostream& file){
     auto sp = parent.lock();
-    if(sp){
-        if(isClone){ // clones call the module.  Non-clones save the code. TODO: will this work???
-            file << "mod"<< sp.get() << "();";
-            return true;
-        }
-        return sp->saveScad(file);
+    if(!sp){ return false; }
+    if(isClone){ // clones call the module.  Non-clones save the code. TODO: will this work???
+        file << "mod" << sp.get() << "();";
+        return true;
     }
-    return false;
+    return sp->saveScad(file);
 }
 
 std::shared_ptr<Object> Module::clone(){
     auto sp = parent.lock();
     if(!sp){ return shared_ptr<Object>(); }
     auto obj = std::make_shared<Module>(sp);
+    obj->img = img;
     obj->isClone = true;
     return obj;
 }

@@ -4,7 +4,6 @@
 #include <memory>
 
 class Object;
-bool makeObjectImage(std::shared_ptr<Object> const & obj); // makes an image of an Operator and set its corresponding Label
 std::shared_ptr<Object> initGui(int width, int height); // initialize layout of the application's GUI
 
 
@@ -15,6 +14,16 @@ class ImageLoader {
 public:
     static void setRenderer(SDL_Renderer* rendereR){ renderer = rendereR; }
     static std::shared_ptr<SDL_Texture> getImage(const std::string& filename);
+};
+
+
+// save openscad code to a file and make an image from it
+// this class has to be initialized by calling ScadSaver::setRoot()
+class ScadSaver {
+    static std::shared_ptr<Object> root;
+public:
+    static void setRoot(std::shared_ptr<Object> const & rooT){ root = rooT; }
+    static bool makeObjectImage(std::shared_ptr<Object> const & obj);
 };
 
 

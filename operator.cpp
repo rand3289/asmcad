@@ -49,7 +49,7 @@ bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
 
 std::shared_ptr<Module> Operator::getModule(){ // not virtual
     if(!module){ module = std::make_shared<Module>(shared_from_this()); }
-    if( !makeObjectImage( module ) ){
+    if( !ScadSaver::makeObjectImage( module ) ){
         std::cout << "ERROR while creating module image." << std::endl;
     }
     return static_pointer_cast<Module>(module->clone());

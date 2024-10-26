@@ -26,11 +26,12 @@ shared_ptr<SDL_Texture> ImageLoader::getImage(const string& filename){
 const string TMP_FILE_SCAD = "tmp.scad";
 const string TMP_FILE_IMG = "tmp.png";
 
+std::shared_ptr<Object> ScadSaver::root;
 
-bool makeObjectImage(shared_ptr<Object> const & obj){
+bool ScadSaver::makeObjectImage(shared_ptr<Object> const & obj){
     // save openscad code from a module/operator to a temp file
-    ofstream file(TMP_FILE_SCAD);
-    if(!obj->saveScad(file)){
+    ofstream file(TMP_FILE_SCAD, ios_base::out | ios::trunc);
+    if(!root->saveScad(file)){
         cout << "Error saving openscad code to temp file " << TMP_FILE_SCAD << endl;
         return false;
     }
@@ -64,6 +65,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto labels = make_shared<Labels>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
     auto main   = make_shared<Main>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
+    ScadSaver::setRoot(main);
     auto dzView       = make_shared<DropZone>(DropZone::VIEW, main);
     auto union_       = make_shared<Operator>(Operator::UNION);
     auto difference   = make_shared<Operator>(Operator::DIFFERENCE);

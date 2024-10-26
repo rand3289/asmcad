@@ -7,8 +7,6 @@
 using namespace std;
 
 
-SDL_Renderer* ImageLoader::renderer;
-
 // load an image as an SDL2 texture
 shared_ptr<SDL_Texture> ImageLoader::getImage(const string& filename){
     cout << "Loading " << filename << endl;
@@ -22,13 +20,14 @@ shared_ptr<SDL_Texture> ImageLoader::getImage(const string& filename){
     return shared_ptr<SDL_Texture>(texture,&SDL_DestroyTexture);
 }
 
-
-const string TMP_FILE_SCAD = "tmp.scad";
-const string TMP_FILE_IMG = "tmp.png";
+SDL_Renderer* ImageLoader::renderer;
 
 std::shared_ptr<Object> ScadSaver::root;
 
 bool ScadSaver::makeObjectImage(shared_ptr<Object> const & obj){
+    const string TMP_FILE_SCAD = "tmp.scad";
+    const string TMP_FILE_IMG = "tmp.png";
+
     // save openscad code from a module/operator to a temp file
     ofstream file(TMP_FILE_SCAD, ios_base::out | ios::trunc);
     if(!root->saveScad(file)){

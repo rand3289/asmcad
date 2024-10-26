@@ -56,7 +56,6 @@ shared_ptr<Operator> Module::getOperator(){
 }
 
 
-
 bool Input::saveScad(ostream& file){
     file << value;
     return true;

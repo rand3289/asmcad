@@ -64,7 +64,7 @@ std::shared_ptr<Object> initGui(int width, int height){
     auto labels = make_shared<Labels>(ITEM_WIDTH, height-ITEM_HEIGHT); // module pics
     auto main   = make_shared<Main>(width-ITEM_WIDTH, height-ITEM_HEIGHT); // main "code" area
 
-    ScadSaver::setRoot(main);
+    ScadSaver::setRoot(main); // main is the component that contains ALL scad code that needs to be saved
     auto dzView       = make_shared<DropZone>(DropZone::VIEW, main);
     auto union_       = make_shared<Operator>(Operator::UNION);
     auto difference   = make_shared<Operator>(Operator::DIFFERENCE);

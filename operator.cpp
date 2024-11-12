@@ -39,6 +39,7 @@ std::shared_ptr<Object> Operator::clone(){
 
 bool Operator::dropped(const Point& xy, std::shared_ptr<Object>const & obj){
     // TODO: check if xy is in loc?
+    if(shared_from_this() == obj){ return false; }
     if(!isClone){ return false; } // originals can only be dragged
     cout << "Adding an object to an operator." << endl;
     layout.addObject(obj);
